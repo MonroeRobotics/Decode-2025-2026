@@ -37,8 +37,8 @@ public class launchTest extends OpMode{
     @Override
     public void loop() {
         if (gamepad.x){
-            motorL.setVelocity(214.28);
-            motorR.setVelocity(214.28);
+            motorL.setPower(0.45);
+            motorR.setPower(0.45);
         }
         if (gamepad.a){
             motorL.setVelocity(0);
