@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-@TeleOp(name = "shootTest", group = "main")
+@TeleOp(name = "shotTest", group = "main")
 public class launchTest extends OpMode{
 
     HardwareMap hardwareMap;
