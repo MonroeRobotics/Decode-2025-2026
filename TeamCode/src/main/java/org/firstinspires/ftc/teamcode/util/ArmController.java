@@ -10,11 +10,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ArmController {
     HardwareMap hardwareMap;
 
-    double closeShotSpeed = 0.45;
-    double farShotSpeed = 0; //placeholder
+    final double closeShotSpeed = 0.45;
+    final double farShotSpeed = 0; //placeholder
+    final double shotSpeedOff = 0;
+    double shotSpeed;
 
-    double intakeSpeed = 0; //placeholder
-
+    final double intakeSpeedOn = 0; //placeholder
+    final double intakeSpeedOff = 0;
+    double intakeSpeed;
 
 
     DcMotorEx intakeMotor;
@@ -22,10 +25,12 @@ public class ArmController {
     DcMotorEx launchMotorR;
 
     enum armState{
-        placeHolder,
-
+        rest,
+        farShot,
+        closeShot,
+        intake,
     }
-    armState currentArmState = armState.placeHolder;
+    static armState currentArmState = armState.rest;
     void initArm(){
         //Assigning each object to its correct port.
         launchMotorL = hardwareMap.get(DcMotorEx.class, "motorL");
@@ -47,8 +52,33 @@ public class ArmController {
     }
     void  updateArmState(){
         switch(currentArmState){
-            case placeHolder:
-                //do thing
+            case rest:
+                intakeSpeed = intakeSpeedOff;
+                shotSpeed = shotSpeedOff;
+                break;
+            case farShot:
+                //todo - adjust angle of ramp once method is found
+                intakeSpeed = intakeSpeedOn;
+                shotSpeed = farShotSpeed;
+
+                break;
+            case closeShot:
+                //todo - adjust angle of ramp once method is found
+                intakeSpeed = intakeSpeedOn;
+                shotSpeed = closeShotSpeed;
+                break;
+            case intake:
+                shotSpeed = shotSpeedOff;
+                intakeSpeed = intakeSpeedOn;
+                break;
+
         }
+
+        launchMotorL.setPower(shotSpeed);
+        launchMotorR.setPower(shotSpeed);
+        intakeMotor.setPower(intakeSpeed);
     }
+    double getShotSpeed(){return shotSpeed;}
+
+    boolean isIntakeOn(){return intakeSpeed != 0;}
 }
