@@ -24,6 +24,10 @@ public class ArmController {
     DcMotorEx launchMotorL;
     DcMotorEx launchMotorR;
 
+    int timer;
+    int waitTime = 500; //time in milliseconds
+    boolean hasUpdatedTimer = false;
+
     enum armState{
         rest,
         farShot,
@@ -50,22 +54,35 @@ public class ArmController {
         //Correcting the spin direction of launch motor.
         launchMotorL.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    void  updateArmState(){
+    void  updateArmState(int time){
         switch(currentArmState){
             case rest:
                 intakeSpeed = intakeSpeedOff;
                 shotSpeed = shotSpeedOff;
                 break;
             case farShot:
-                //todo - adjust angle of ramp once method is found
-                intakeSpeed = intakeSpeedOn;
-                shotSpeed = farShotSpeed;
-
+                //todo - adjust ramp angle once Kingston finds a method
+                if (!hasUpdatedTimer){
+                    updateTimer(time);
+                    hasUpdatedTimer = true;
+                }
+                if (time >= timer){
+                    shotSpeed = farShotSpeed;
+                    intakeSpeed = intakeSpeedOn;
+                    hasUpdatedTimer = false;
+                }
                 break;
             case closeShot:
-                //todo - adjust angle of ramp once method is found
-                intakeSpeed = intakeSpeedOn;
-                shotSpeed = closeShotSpeed;
+                //todo - adjust ramp angle once Kingston finds a method
+                if (!hasUpdatedTimer){
+                    updateTimer(time);
+                    hasUpdatedTimer = true;
+                }
+                if (time >= timer){
+                    shotSpeed = closeShotSpeed;
+                    intakeSpeed = intakeSpeedOn;
+                    hasUpdatedTimer = false;
+                }
                 break;
             case intake:
                 shotSpeed = shotSpeedOff;
@@ -81,4 +98,14 @@ public class ArmController {
     double getShotSpeed(){return shotSpeed;}
 
     boolean isIntakeOn(){return intakeSpeed != 0;}
+
+    void setIntakeSpeed(double Intake_Speed){intakeSpeed = Intake_Speed;}
+
+    void setShotSpeed(double Shot_Speed){shotSpeed = Shot_Speed;}
+
+    void updateTimer(int time){
+        timer = time + waitTime;
+    }
+
+
 }
