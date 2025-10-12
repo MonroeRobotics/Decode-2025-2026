@@ -37,8 +37,8 @@ public class ArmController {
     static armState currentArmState = armState.rest;
     void initArm(){
         //Assigning each object to its correct port.
-        launchMotorL = hardwareMap.get(DcMotorEx.class, "motorL");
-        launchMotorR = hardwareMap.get(DcMotorEx.class, "motorR");
+        launchMotorL = hardwareMap.get(DcMotorEx.class, "launchMotorL");
+        launchMotorR = hardwareMap.get(DcMotorEx.class, "launchMotorR");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
 
         //Making all motors brake when not powered.
