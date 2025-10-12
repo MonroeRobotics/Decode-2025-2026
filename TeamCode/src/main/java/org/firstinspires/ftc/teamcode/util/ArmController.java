@@ -10,12 +10,20 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ArmController {
     HardwareMap hardwareMap;
 
+    double closeShotSpeed = 0.45;
+    double farShotSpeed = 0; //placeholder
+
+    double intakeSpeed = 0; //placeholder
+
+
+
     DcMotorEx intakeMotor;
     DcMotorEx launchMotorL;
     DcMotorEx launchMotorR;
 
     enum armState{
         placeHolder,
+
     }
     armState currentArmState = armState.placeHolder;
     void initArm(){
