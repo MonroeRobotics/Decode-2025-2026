@@ -41,8 +41,8 @@ public class launchTest extends OpMode{
             motorR.setPower(0.45);
         }
         if (gamepad.a){
-            motorL.setVelocity(0);
-            motorR.setVelocity(0);
+            motorL.setPower(0);
+            motorR.setPower(0);
         }
     }
 }
