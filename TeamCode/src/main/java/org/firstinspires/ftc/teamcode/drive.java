@@ -58,11 +58,22 @@ public class drive extends OpMode {
         if (currentGamepad.right_stick_x >= 0.2 || currentGamepad.right_stick_x <= -0.2){
             headingPower = currentGamepad.right_stick_x;
         }
+        if (currentGamepad.right_bumper){
+            armController.currentArmState = ArmController.armState.closeShot;
+        }
+        if (currentGamepad.right_trigger > 0){
+            armController.currentArmState = ArmController.armState.farShot;
+        }
+        if (currentGamepad.left_trigger > 0){
+            armController.currentArmState = ArmController.armState.outake;
+        }
 
         Vector2d gamepadInput = new Vector2d(xPower, yPower);
         PoseVelocity2d mechanumMotorPowers = new PoseVelocity2d(gamepadInput, headingPower);
 
         mecanumDrive.setDrivePowers(mechanumMotorPowers);
+
+        armController.updateArmState(System.currentTimeMillis());
 
 
         if (armController.advancementServoSpeed != 0) {intakeState = "on";}

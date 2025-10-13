@@ -36,17 +36,18 @@ public class ArmController {
 
     CRServo advancementServo;
 
-    int timer;
-    int waitTime = 500; //time in milliseconds
+    long timer;
+    long waitTime = 500; //time in milliseconds
     boolean hasUpdatedTimer = false;
 
-    enum armState{
+    public enum armState{
         rest,
         farShot,
         closeShot,
         intake,
+        outake
     }
-    static armState currentArmState = armState.rest;
+    public armState currentArmState = armState.rest;
     public void initArm(){
         //Assigning each object to its correct port.
         launchMotorL = hardwareMap.get(DcMotorEx.class, "launchMotorL");
@@ -67,7 +68,7 @@ public class ArmController {
         //Correcting the spin direction of launch motor.
         launchMotorL.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public void updateArmState(int time){
+    public void updateArmState(long time){
         switch(currentArmState){
             case rest:
                 dcIntakeSpeed = dcIntakeSpeedOff;
@@ -105,6 +106,11 @@ public class ArmController {
                 advancementServoSpeed = advancementServoSpeedOn;
                 dcIntakeSpeed = dcIntakeSpeedOn;
                 break;
+            case outake:
+                shotSpeed = shotSpeedOff;
+                advancementServoSpeed = -advancementServoSpeedOn;
+                dcIntakeSpeed = -dcIntakeSpeedOn;
+                break;
 
         }
 
@@ -122,7 +128,7 @@ public class ArmController {
 
     void setShotSpeed(double Shot_Speed){shotSpeed = Shot_Speed;}
 
-    void updateTimer(int time){timer = time + waitTime;}
+    void updateTimer(long time){timer = time + waitTime;}
 
 
 }
