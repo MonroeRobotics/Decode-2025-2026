@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -53,16 +54,29 @@ public class drive extends OpMode {
         }
         if (currentGamepad.left_stick_y >= 0.2 || currentGamepad.left_stick_y <= -0.2) {
             yPower = currentGamepad.left_stick_y;
-
-            if (armController.advancementServoSpeed != 0) {intakeState = "on";}
-            else {intakeState = "off";}
-
-            if (armController.shotSpeed == 0.45) {shotSpeedState = "close";}
-            else if (armController.shotSpeed == armController.farShotSpeed) {shotSpeedState = "far";}
-            else {shotSpeedState = "off";}
-
-            telemetry.addData("launchMotorSpeed", armController.shotSpeed);
-            telemetry.addData("advancement servo Status", intakeState);
         }
+        if (currentGamepad.right_stick_x >= 0.2 || currentGamepad.right_stick_x <= -0.2){
+            headingPower = currentGamepad.right_stick_x;
+        }
+
+        Vector2d gamepadInput = new Vector2d(xPower, yPower);
+        PoseVelocity2d mechanumMotorPowers = new PoseVelocity2d(gamepadInput, headingPower);
+
+        mecanumDrive.setDrivePowers(mechanumMotorPowers);
+
+
+        if (armController.advancementServoSpeed != 0) {intakeState = "on";}
+        else {intakeState = "off";}
+
+        if (armController.shotSpeed == 0.45) {shotSpeedState = "close";}
+        else if (armController.shotSpeed == armController.farShotSpeed) {shotSpeedState = "far";}
+        else {shotSpeedState = "off";}
+
+        telemetry.update();
+
+        telemetry.addData("launchMotorSpeed", armController.shotSpeed);
+        telemetry.addData("advancement servo Status", intakeState);
     }
+
+
 }
