@@ -8,20 +8,24 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class ArmController {
+    public ArmController (HardwareMap hardwareMap){
+        this.hardwareMap = hardwareMap;
+    }
     HardwareMap hardwareMap;
 
-    final double closeShotSpeed = 0.45;
-    final double farShotSpeed = 0; //placeholder
-    final double shotSpeedOff = 0;
-    double shotSpeed;
+    public final double closeShotSpeed = 0.45;
+    public final double farShotSpeed = 0; //placeholder
+    public final double shotSpeedOff = 0;
+    public double shotSpeed;
 
-    final double dcIntakeSpeedOn = 0; //placeholder
-    final double dcIntakeSpeedOff = 0;
+    public final double dcIntakeSpeedOn = 0; //placeholder
+    public final double dcIntakeSpeedOff = 0;
 
-    final double advancementServoSpeedOn = 1; //placeholder
-    final double advancementServoSpeedOff = 0;
-    double dcIntakeSpeed;
-    double advancementServoSpeed;
+    public final double advancementServoSpeedOn = 1; //placeholder
+    public final double advancementServoSpeedOff = 0;
+
+    public double dcIntakeSpeed;
+    public double advancementServoSpeed;
 
 
 
@@ -43,7 +47,7 @@ public class ArmController {
         intake,
     }
     static armState currentArmState = armState.rest;
-    void initArm(){
+    public void initArm(){
         //Assigning each object to its correct port.
         launchMotorL = hardwareMap.get(DcMotorEx.class, "launchMotorL");
         launchMotorR = hardwareMap.get(DcMotorEx.class, "launchMotorR");
@@ -63,7 +67,7 @@ public class ArmController {
         //Correcting the spin direction of launch motor.
         launchMotorL.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    void  updateArmState(int time){
+    public void updateArmState(int time){
         switch(currentArmState){
             case rest:
                 dcIntakeSpeed = dcIntakeSpeedOff;
