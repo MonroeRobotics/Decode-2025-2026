@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.util;
 
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 public class ArmController {
     HardwareMap hardwareMap;
@@ -15,14 +15,22 @@ public class ArmController {
     final double shotSpeedOff = 0;
     double shotSpeed;
 
-    final double intakeSpeedOn = 0; //placeholder
-    final double intakeSpeedOff = 0;
-    double intakeSpeed;
+    final double dcIntakeSpeedOn = 0; //placeholder
+    final double dcIntakeSpeedOff = 0;
+
+    final double advancementServoSpeedOn = 1; //placeholder
+    final double advancementServoSpeedOff = 0;
+    double dcIntakeSpeed;
+    double advancementServoSpeed;
+
+
 
 
     DcMotorEx intakeMotor;
     DcMotorEx launchMotorL;
     DcMotorEx launchMotorR;
+
+    CRServo advancementServo;
 
     int timer;
     int waitTime = 500; //time in milliseconds
@@ -40,6 +48,7 @@ public class ArmController {
         launchMotorL = hardwareMap.get(DcMotorEx.class, "launchMotorL");
         launchMotorR = hardwareMap.get(DcMotorEx.class, "launchMotorR");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+        advancementServo = hardwareMap.get(CRServo.class, "advancementServo");
 
         //Making all motors brake when not powered.
         launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -57,7 +66,8 @@ public class ArmController {
     void  updateArmState(int time){
         switch(currentArmState){
             case rest:
-                intakeSpeed = intakeSpeedOff;
+                dcIntakeSpeed = dcIntakeSpeedOff;
+                advancementServoSpeed = advancementServoSpeedOff;
                 shotSpeed = shotSpeedOff;
                 break;
             case farShot:
@@ -67,8 +77,9 @@ public class ArmController {
                     hasUpdatedTimer = true;
                 }
                 if (time >= timer){
+                    advancementServoSpeed = advancementServoSpeedOn;
+                    dcIntakeSpeed = dcIntakeSpeedOn;
                     shotSpeed = farShotSpeed;
-                    intakeSpeed = intakeSpeedOn;
                     hasUpdatedTimer = false;
                 }
                 break;
@@ -79,33 +90,35 @@ public class ArmController {
                     hasUpdatedTimer = true;
                 }
                 if (time >= timer){
+                    advancementServoSpeed = advancementServoSpeedOn;
+                    dcIntakeSpeed = dcIntakeSpeedOn;
                     shotSpeed = closeShotSpeed;
-                    intakeSpeed = intakeSpeedOn;
                     hasUpdatedTimer = false;
                 }
                 break;
             case intake:
                 shotSpeed = shotSpeedOff;
-                intakeSpeed = intakeSpeedOn;
+                advancementServoSpeed = advancementServoSpeedOn;
+                dcIntakeSpeed = dcIntakeSpeedOn;
                 break;
 
         }
 
         launchMotorL.setPower(shotSpeed);
         launchMotorR.setPower(shotSpeed);
-        intakeMotor.setPower(intakeSpeed);
+        intakeMotor.setPower(dcIntakeSpeed);
+
+        advancementServo.setPower(advancementServoSpeed);
     }
     double getShotSpeed(){return shotSpeed;}
 
-    boolean isIntakeOn(){return intakeSpeed != 0;}
+    boolean isIntakeOn(){return dcIntakeSpeed != 0;}
 
-    void setIntakeSpeed(double Intake_Speed){intakeSpeed = Intake_Speed;}
+    void setIntakeSpeed(double Intake_Speed){dcIntakeSpeed = Intake_Speed;}
 
     void setShotSpeed(double Shot_Speed){shotSpeed = Shot_Speed;}
 
-    void updateTimer(int time){
-        timer = time + waitTime;
-    }
+    void updateTimer(int time){timer = time + waitTime;}
 
 
 }
