@@ -120,13 +120,13 @@ public class ArmController {
 
         advancementServo.setPower(advancementServoSpeed);
     }
-    double getShotSpeed(){return shotSpeed;}
+    public double getShotSpeed(){return shotSpeed;}
 
-    boolean isIntakeOn(){return dcIntakeSpeed != 0;}
+    public boolean isIntakeOn(){return dcIntakeSpeed != 0;}
 
-    void setIntakeSpeed(double Intake_Speed){dcIntakeSpeed = Intake_Speed;}
+    public void setIntakeSpeed(double Intake_Speed){dcIntakeSpeed = Intake_Speed;}
 
-    void setShotSpeed(double Shot_Speed){shotSpeed = Shot_Speed;}
+    public void setShotSpeed(double Shot_Speed){shotSpeed = Shot_Speed;}
 
     void updateTimer(long time){timer = time + waitTime;}
 
