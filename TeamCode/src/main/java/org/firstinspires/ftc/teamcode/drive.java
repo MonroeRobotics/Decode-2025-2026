@@ -94,7 +94,7 @@ public class drive extends OpMode {
         }
         if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
             if (!outtakeOn) {
-                armController.currentArmState = ArmController.armState.outake;
+                armController.currentArmState = ArmController.armState.outtake;
                 outtakeOn = true;
             }
             else {

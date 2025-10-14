@@ -20,8 +20,8 @@ public class launchTest extends OpMode{
 
     @Override
     public void init() {
-        motorL = hardwareMap.get(DcMotorEx.class, "motorL");
-        motorR = hardwareMap.get(DcMotorEx.class, "motorL");
+        motorL = hardwareMap.get(DcMotorEx.class, "leftMotor");
+        motorR = hardwareMap.get(DcMotorEx.class, "rightMotor");
 
         motorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
