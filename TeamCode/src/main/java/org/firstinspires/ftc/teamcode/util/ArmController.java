@@ -18,6 +18,9 @@ public class ArmController {
     public final double shotSpeedOff = 0;
     public double shotSpeed;
 
+    public enum ShotSpeedState{close, far, undefined};
+    ShotSpeedState shotSpeedState = ShotSpeedState.undefined;
+
     public final double dcIntakeSpeedOn = 0; //placeholder
     public final double dcIntakeSpeedOff = 0;
 
@@ -77,28 +80,48 @@ public class ArmController {
                 break;
             case farShot:
                 //todo - adjust ramp angle once Kingston finds a method
-                if (!hasUpdatedTimer){
-                    updateTimer(time);
-                    hasUpdatedTimer = true;
+                if (shotSpeedState == ShotSpeedState.close || shotSpeedState == ShotSpeedState.undefined) {
+                    if (!hasUpdatedTimer) {
+                        updateTimer(time);
+                        hasUpdatedTimer = true;
+                    }
+                    if (time >= timer) {
+                        advancementServoSpeed = advancementServoSpeedOn;
+                        dcIntakeSpeed = dcIntakeSpeedOn;
+                        shotSpeed = farShotSpeed;
+                        shotSpeedState = ShotSpeedState.far;
+                        hasUpdatedTimer = false;
+                    }
                 }
-                if (time >= timer){
+                else {
                     advancementServoSpeed = advancementServoSpeedOn;
                     dcIntakeSpeed = dcIntakeSpeedOn;
                     shotSpeed = farShotSpeed;
                     hasUpdatedTimer = false;
+                    shotSpeedState = ShotSpeedState.far;
                 }
                 break;
             case closeShot:
                 //todo - adjust ramp angle once Kingston finds a method
-                if (!hasUpdatedTimer){
-                    updateTimer(time);
-                    hasUpdatedTimer = true;
+                if (shotSpeedState == ShotSpeedState.far || shotSpeedState == ShotSpeedState.undefined) {
+                    if (!hasUpdatedTimer) {
+                        updateTimer(time);
+                        hasUpdatedTimer = true;
+                    }
+                    if (time >= timer) {
+                        advancementServoSpeed = advancementServoSpeedOn;
+                        dcIntakeSpeed = dcIntakeSpeedOn;
+                        shotSpeed = closeShotSpeed;
+                        shotSpeedState = ShotSpeedState.close;
+                        hasUpdatedTimer = false;
+                    }
                 }
-                if (time >= timer){
+                else {
                     advancementServoSpeed = advancementServoSpeedOn;
                     dcIntakeSpeed = dcIntakeSpeedOn;
                     shotSpeed = closeShotSpeed;
                     hasUpdatedTimer = false;
+                    shotSpeedState = ShotSpeedState.close;
                 }
                 break;
             case intake:
