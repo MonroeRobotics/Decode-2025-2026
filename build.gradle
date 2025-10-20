@@ -6,6 +6,7 @@
 
 buildscript {
     repositories {
+        maven { url = 'https://maven.brott.dev/' }
         mavenCentral()
         google()
     }
