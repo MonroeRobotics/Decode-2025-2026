@@ -37,8 +37,8 @@ public class launchTest extends OpMode{
     @Override
     public void loop() {
         if (gamepad.x){
-            motorL.setPower(0.45);
-            motorR.setPower(0.45);
+            motorL.setPower(0.65);
+            motorR.setPower(0.65);
         }
         if (gamepad.a){
             motorL.setPower(0);
