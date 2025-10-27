@@ -133,12 +133,14 @@ public class drive extends OpMode {
 
         telemetry.update();
 
-        telemetry.addData("x power", xPower);
-        telemetry.addData("y power", yPower);
-        telemetry.addData("heading power", headingPower);
-        telemetry.addData("arm state", armController.currentArmState);
-        telemetry.addData("launch motor status", shotSpeedState);
-        telemetry.addData("advancement servo Status", intakeState);
+        telemetry.addData("X power", xPower);
+        telemetry.addData("Y power", yPower);
+        telemetry.addData("gamepad X", gamepad1.left_stick_x);
+        telemetry.addData("gamepad Y", gamepad1.left_stick_y);
+        telemetry.addData("Heading power", headingPower);
+        telemetry.addData("Arm state", armController.currentArmState);
+        telemetry.addData("Launch status", shotSpeedState);
+        telemetry.addData("Intake Status", intakeState);
     }
 
 

@@ -79,7 +79,7 @@ public class ArmController {
                 shotSpeed = shotSpeedOff;
                 break;
             case farShot:
-                //todo - adjust ramp angle once Kingston finds a method
+                //todo - adjust ramp angle
                 if (shotSpeedState == ShotSpeedState.close || shotSpeedState == ShotSpeedState.undefined) {
                     if (!hasUpdatedTimer) {
                         updateTimer(time);
@@ -102,7 +102,7 @@ public class ArmController {
                 }
                 break;
             case closeShot:
-                //todo - adjust ramp angle once Kingston finds a method
+                //todo - adjust ramp angle
                 if (shotSpeedState == ShotSpeedState.far || shotSpeedState == ShotSpeedState.undefined) {
                     if (!hasUpdatedTimer) {
                         updateTimer(time);
