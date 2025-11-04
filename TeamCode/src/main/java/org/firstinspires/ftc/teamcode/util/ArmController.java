@@ -8,23 +8,24 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class ArmController {
+
     public ArmController (HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
     }
     HardwareMap hardwareMap;
 
     public final double closeShotSpeed = 0.45;
-    public final double farShotSpeed = 0; //placeholder
+    public final double farShotSpeed = 1; //placeholder
     public final double shotSpeedOff = 0;
     public double shotSpeed;
 
     public enum ShotSpeedState{close, far, undefined};
     ShotSpeedState shotSpeedState = ShotSpeedState.undefined;
 
-    public final double dcIntakeSpeedOn = 0; //placeholder
+    public final double dcIntakeSpeedOn = 0.2;
     public final double dcIntakeSpeedOff = 0;
 
-    public final double advancementServoSpeedOn = 1; //placeholder
+    public final double advancementServoSpeedOn = 0.5;
     public final double advancementServoSpeedOff = 0;
 
     public double dcIntakeSpeed;

@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 @TeleOp(name = "drive", group = "main")
 public class drive extends OpMode {
     private static final Logger log = LoggerFactory.getLogger(drive.class);
-    HardwareMap hardwareMap;
     ArmController armController;
 
     double xPower;
@@ -77,7 +76,7 @@ public class drive extends OpMode {
                 armController.currentArmState = ArmController.armState.closeShot;
                 closeShotOn = true;
             }
-            else{
+            else {
                 armController.currentArmState = ArmController.armState.rest;
                 closeShotOn = false;
             }
@@ -102,15 +101,8 @@ public class drive extends OpMode {
                 outtakeOn = false;
             }
         }
-        if (currentGamepad.left_trigger > 0.2 && !(previousGamepad.left_trigger > 0.2)){
-            if (!intakeOn){
-                armController.currentArmState = ArmController.armState.intake;
-                intakeOn = true;
-            }
-            else{
-                armController.currentArmState = ArmController.armState.rest;
-                intakeOn = false;
-            }
+        if ((currentGamepad.left_trigger > 0.2) && !(currentGamepad.left_trigger > 0.2)){
+            armController.currentArmState = ArmController.armState.intake;
         }
 
         Vector2d gamepadInput = new Vector2d(xPower, yPower);
@@ -141,6 +133,7 @@ public class drive extends OpMode {
         telemetry.addData("Arm state", armController.currentArmState);
         telemetry.addData("Launch status", shotSpeedState);
         telemetry.addData("Intake Status", intakeState);
+        telemetry.addData("left trigger", gamepad1.left_trigger);
     }
 
 
