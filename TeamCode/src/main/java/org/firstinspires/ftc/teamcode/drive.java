@@ -101,8 +101,15 @@ public class drive extends OpMode {
                 outtakeOn = false;
             }
         }
-        if ((currentGamepad.left_trigger > 0.2) && !(currentGamepad.left_trigger > 0.2)){
-            armController.currentArmState = ArmController.armState.intake;
+        if ((currentGamepad.left_trigger > 0.2) && !(previousGamepad.left_trigger > 0.2)){
+            if (!closeShotOn) {
+                armController.currentArmState = ArmController.armState.closeShot;
+                closeShotOn = true;
+            }
+            else{
+                armController.currentArmState = ArmController.armState.rest;
+                closeShotOn = false;
+            }
         }
 
         Vector2d gamepadInput = new Vector2d(xPower, yPower);
