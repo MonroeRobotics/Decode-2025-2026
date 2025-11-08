@@ -48,7 +48,6 @@ public class drive extends OpMode {
         armController = new ArmController(hardwareMap);
         armController.initArm();
 
-        gamepad1 = new Gamepad();
         previousGamepad = new Gamepad();
 
         mecanumDrive = new MecanumDrive(hardwareMap, pose);

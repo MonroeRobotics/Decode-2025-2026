@@ -94,11 +94,12 @@ public class ArmController {
                     updateOuttakeTimer(time);
                     hasUpdatedOuttakeTimer = true;
                 }
-                if ((time >= outtakeTimer) && hasUpdatedOuttakeTimer) {
+                if (time >= outtakeTimer) {
                     dcIntakeSpeed = dcIntakeSpeedOn;
                     advancementServoSpeed = advancementServoSpeedOff;
                     shotSpeed = shotSpeedOff;
                     //adjust ramp angle
+
                     if (shotSpeedState == ShotSpeedState.close || shotSpeedState == ShotSpeedState.undefined) {
                         if (!hasUpdatedAdjusterTimer) {
                             updateAdjusterTimer(time);
@@ -109,12 +110,14 @@ public class ArmController {
                             shotSpeed = farShotSpeed;
                             shotSpeedState = ShotSpeedState.far;
                             hasUpdatedAdjusterTimer = false;
+                            hasUpdatedOuttakeTimer = false;
                         }
                     }
                     else {
                         advancementServoSpeed = advancementServoSpeedOn;
                         shotSpeed = farShotSpeed;
                         hasUpdatedAdjusterTimer = false;
+                        hasUpdatedOuttakeTimer =false;
                         shotSpeedState = ShotSpeedState.far;
                     }
                 }
@@ -126,7 +129,7 @@ public class ArmController {
                     updateOuttakeTimer(time);
                     hasUpdatedOuttakeTimer = true;
                 }
-                if ((time >= outtakeTimer) && hasUpdatedOuttakeTimer) {
+                if (time >= outtakeTimer) {
                     dcIntakeSpeed = dcIntakeSpeedOn;
                     advancementServoSpeed = advancementServoSpeedOff;
                     shotSpeed = shotSpeedOff;
@@ -141,12 +144,14 @@ public class ArmController {
                             shotSpeed = farShotSpeed;
                             shotSpeedState = ShotSpeedState.close;
                             hasUpdatedAdjusterTimer = false;
+                            hasUpdatedOuttakeTimer = false;
                         }
                     }
                     else {
                         advancementServoSpeed = advancementServoSpeedOn;
                         shotSpeed = closeShotSpeed;
                         hasUpdatedAdjusterTimer = false;
+                        hasUpdatedOuttakeTimer = false;
                         shotSpeedState = ShotSpeedState.far;
                     }
                 }
