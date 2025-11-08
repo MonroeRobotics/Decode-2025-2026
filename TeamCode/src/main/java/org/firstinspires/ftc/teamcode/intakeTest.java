@@ -16,6 +16,6 @@ public class intakeTest extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.);
+
     }
 }
