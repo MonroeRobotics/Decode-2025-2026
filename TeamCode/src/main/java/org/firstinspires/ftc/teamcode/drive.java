@@ -48,7 +48,7 @@ public class drive extends OpMode {
         armController = new ArmController(hardwareMap);
         armController.initArm();
 
-        currentGamepad = new Gamepad();
+        gamepad1 = new Gamepad();
         previousGamepad = new Gamepad();
 
         mecanumDrive = new MecanumDrive(hardwareMap, pose);
@@ -56,13 +56,13 @@ public class drive extends OpMode {
 
     @Override
     public void loop() {
-        if (currentGamepad.left_stick_x >= 0.2 || currentGamepad.left_stick_x <= -0.2) {
-            xPower = -currentGamepad.left_stick_x;
+        if (gamepad1.left_stick_x >= 0.2 || gamepad1.left_stick_x <= -0.2) {
+            xPower = -gamepad1.left_stick_x;
         }
-        if (currentGamepad.left_stick_y >= 0.2 || currentGamepad.left_stick_y <= -0.2) {
+        if (gamepad1.left_stick_y >= 0.2 || gamepad1.left_stick_y <= -0.2) {
             yPower = -currentGamepad.left_stick_y;
         }
-        if (currentGamepad.right_stick_x >= 0.2 || currentGamepad.right_stick_x <= -0.2){
+        if (gamepad1.right_stick_x >= 0.2 || gamepad1.right_stick_x <= -0.2){
             headingPower = -currentGamepad.right_stick_x;
         }
 
@@ -71,7 +71,7 @@ public class drive extends OpMode {
         headingPower *= drivePowerReduction;
 
 
-        if (currentGamepad.right_bumper && !previousGamepad.right_bumper){
+        if (gamepad1.right_bumper && !previousGamepad.right_bumper){
             if (!closeShotOn) {
                 armController.currentArmState = ArmController.armState.closeShot;
                 closeShotOn = true;
@@ -81,7 +81,7 @@ public class drive extends OpMode {
                 closeShotOn = false;
             }
         }
-        if ((currentGamepad.right_trigger > 0.2) && !(previousGamepad.right_trigger > 0.2)){
+        if ((gamepad1.right_trigger > 0.2) && !(previousGamepad.right_trigger > 0.2)){
             if (!farShotOn) {
                 armController.currentArmState = ArmController.armState.farShot;
                 farShotOn = true;
@@ -91,7 +91,7 @@ public class drive extends OpMode {
                 farShotOn = false;
             }
         }
-        if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+        if (gamepad1.left_bumper && !previousGamepad.left_bumper) {
             if (!outtakeOn) {
                 armController.currentArmState = ArmController.armState.outtake;
                 outtakeOn = true;
@@ -101,7 +101,7 @@ public class drive extends OpMode {
                 outtakeOn = false;
             }
         }
-        if ((currentGamepad.left_trigger > 0.2) && !(previousGamepad.left_trigger > 0.2)){
+        if ((gamepad1.left_trigger > 0.2) && !(previousGamepad.left_trigger > 0.2)){
             if (!closeShotOn) {
                 armController.currentArmState = ArmController.armState.closeShot;
                 closeShotOn = true;
@@ -119,7 +119,7 @@ public class drive extends OpMode {
 
         armController.updateArmState(System.currentTimeMillis());
 
-        previousGamepad.copy(currentGamepad);
+        previousGamepad.copy(gamepad1);
 
 
         if (armController.advancementServoSpeed > 0) {intakeState = "intake";}
