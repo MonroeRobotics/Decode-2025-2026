@@ -35,8 +35,7 @@ public class MeepMeepTesting {
 
         blueBot.runAction(blueBot.getDrive().actionBuilder(new Pose2d(blueStart, Math.toRadians(180)))
                 .waitSeconds(2)
-                .strafeToLinearHeading(blueFarShot, Math.toRadians(203))
-                .waitSeconds(2)
+                .strafeToLinearHeading(blueFarShot, Math.toRadians(180))
                 .turnTo(Math.toRadians(270))
                 .strafeToLinearHeading(blueHumanPlayer, Math.toRadians(270))
                 .strafeToLinearHeading(blueFarShot, Math.toRadians(203))
@@ -53,8 +52,7 @@ public class MeepMeepTesting {
                 .build());
         redBot.runAction(redBot.getDrive().actionBuilder(new Pose2d(redStart, Math.toRadians(180)))
                 .waitSeconds(2)
-                .strafeToLinearHeading(redFarShot, Math.toRadians(157))
-                .waitSeconds(2)
+                .strafeToLinearHeading(redFarShot, Math.toRadians(180))
                 .turnTo(Math.toRadians(90))
                 .strafeToLinearHeading(redHumanPlayer, Math.toRadians(90))
                 .strafeToLinearHeading(redFarShot, Math.toRadians(157))
