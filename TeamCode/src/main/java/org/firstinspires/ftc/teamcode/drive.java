@@ -59,10 +59,10 @@ public class drive extends OpMode {
             xPower = -gamepad1.left_stick_x;
         }
         if (gamepad1.left_stick_y >= 0.2 || gamepad1.left_stick_y <= -0.2) {
-            yPower = -currentGamepad.left_stick_y;
+            yPower = -gamepad1.left_stick_y;
         }
         if (gamepad1.right_stick_x >= 0.2 || gamepad1.right_stick_x <= -0.2){
-            headingPower = -currentGamepad.right_stick_x;
+            headingPower = -gamepad1.right_stick_x;
         }
 
         xPower *= drivePowerReduction;
@@ -71,6 +71,8 @@ public class drive extends OpMode {
 
 
         if (gamepad1.right_bumper && !previousGamepad.right_bumper){
+            armController.hasUpdatedOuttakeTimer = false;
+            armController.hasUpdatedAdjusterTimer = false;
             if (!closeShotOn) {
                 armController.currentArmState = ArmController.armState.closeShot;
                 closeShotOn = true;
@@ -81,6 +83,8 @@ public class drive extends OpMode {
             }
         }
         if ((gamepad1.right_trigger > 0.2) && !(previousGamepad.right_trigger > 0.2)){
+            armController.hasUpdatedOuttakeTimer = false;
+            armController.hasUpdatedAdjusterTimer = false;
             if (!farShotOn) {
                 armController.currentArmState = ArmController.armState.farShot;
                 farShotOn = true;
@@ -102,7 +106,7 @@ public class drive extends OpMode {
         }
         if ((gamepad1.left_trigger > 0.2) && !(previousGamepad.left_trigger > 0.2)){
             if (!closeShotOn) {
-                armController.currentArmState = ArmController.armState.closeShot;
+                armController.currentArmState = ArmController.armState.intake;
                 closeShotOn = true;
             }
             else{
@@ -137,9 +141,9 @@ public class drive extends OpMode {
         telemetry.addData("gamepad Y", gamepad1.left_stick_y);
         telemetry.addData("Heading power", headingPower);
         telemetry.addData("Arm state", armController.currentArmState);
-        telemetry.addData("Launch status", shotSpeedState);
-        telemetry.addData("Intake Status", intakeState);
+        telemetry.addData("Launch Speed", armController.shotSpeed);
         telemetry.addData("left trigger", gamepad1.left_trigger);
+        telemetry.addData("Dc intake Speed", armController.dcIntakeSpeed);
     }
 
 

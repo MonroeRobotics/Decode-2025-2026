@@ -47,9 +47,9 @@ public class ArmController {
     long outtakeTimer;
     long adjustWaitTime = 500; //time in milliseconds
     long outtakeWaitTime = 200;
-    boolean hasUpdatedAdjusterTimer = false;
-    boolean hasUpdatedAdvancementTimer = false;
-    boolean hasUpdatedOuttakeTimer = false;
+    public boolean hasUpdatedAdjusterTimer = false;
+    public boolean hasUpdatedAdvancementTimer = false;
+    public boolean hasUpdatedOuttakeTimer = false;
 
 
     public enum armState{
@@ -79,6 +79,8 @@ public class ArmController {
 
         //Correcting the spin direction of launch motor.
         launchMotorL.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        advancementServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void updateArmState(long time){
         switch(currentArmState){
@@ -109,15 +111,11 @@ public class ArmController {
                             advancementServoSpeed = advancementServoSpeedOn;
                             shotSpeed = farShotSpeed;
                             shotSpeedState = ShotSpeedState.far;
-                            hasUpdatedAdjusterTimer = false;
-                            hasUpdatedOuttakeTimer = false;
                         }
                     }
                     else {
                         advancementServoSpeed = advancementServoSpeedOn;
                         shotSpeed = farShotSpeed;
-                        hasUpdatedAdjusterTimer = false;
-                        hasUpdatedOuttakeTimer =false;
                         shotSpeedState = ShotSpeedState.far;
                     }
                 }
@@ -141,17 +139,13 @@ public class ArmController {
                         }
                         if (time >= adjusterTimer) {
                             advancementServoSpeed = advancementServoSpeedOn;
-                            shotSpeed = farShotSpeed;
+                            shotSpeed = closeShotSpeed;
                             shotSpeedState = ShotSpeedState.close;
-                            hasUpdatedAdjusterTimer = false;
-                            hasUpdatedOuttakeTimer = false;
                         }
                     }
                     else {
                         advancementServoSpeed = advancementServoSpeedOn;
                         shotSpeed = closeShotSpeed;
-                        hasUpdatedAdjusterTimer = false;
-                        hasUpdatedOuttakeTimer = false;
                         shotSpeedState = ShotSpeedState.far;
                     }
                 }
