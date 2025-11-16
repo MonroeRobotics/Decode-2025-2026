@@ -46,7 +46,7 @@ public class ArmController {
     long advancementTimer;
     long outtakeTimer;
     long adjustWaitTime = 500; //time in milliseconds
-    long outtakeWaitTime = 200;
+    long outtakeWaitTime = 1500;
     public boolean hasUpdatedAdjusterTimer = false;
     public boolean hasUpdatedAdvancementTimer = false;
     public boolean hasUpdatedOuttakeTimer = false;
@@ -146,7 +146,7 @@ public class ArmController {
                     else {
                         advancementServoSpeed = advancementServoSpeedOn;
                         shotSpeed = closeShotSpeed;
-                        shotSpeedState = ShotSpeedState.far;
+                        shotSpeedState = ShotSpeedState.close;
                     }
                 }
                 break;
