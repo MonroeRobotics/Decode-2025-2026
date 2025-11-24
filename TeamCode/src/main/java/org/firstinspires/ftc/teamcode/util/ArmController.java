@@ -28,6 +28,7 @@ public class ArmController {
     public final double dcIntakeSpeedOff = 0;
 
     public final double advancementServoSpeedOn = 0.5;
+    public final double advancementServoSpeedOuttake = -0.5;
     public final double advancementServoSpeedOff = 0;
 
     public double dcIntakeSpeed;
@@ -46,7 +47,8 @@ public class ArmController {
     long advancementTimer;
     long outtakeTimer;
     long adjustWaitTime = 500; //time in milliseconds
-    long outtakeWaitTime = 1500;
+    long outtakeWaitTime = 750;
+    long advancementWaitTime = 250;
     public boolean hasUpdatedAdjusterTimer = false;
     public boolean hasUpdatedAdvancementTimer = false;
     public boolean hasUpdatedOuttakeTimer = false;
@@ -91,6 +93,7 @@ public class ArmController {
                 break;
             case farShot:
                 dcIntakeSpeed = dcIntakeSpeedOuttake;
+                advancementServoSpeed = advancementServoSpeedOuttake;
                 shotSpeed = shotSpeedOuttake;
                 if (!hasUpdatedOuttakeTimer) {
                     updateOuttakeTimer(time);
@@ -101,8 +104,13 @@ public class ArmController {
                     advancementServoSpeed = advancementServoSpeedOff;
                     shotSpeed = shotSpeedOff;
                     //adjust ramp angle
+                    if (!hasUpdatedAdvancementTimer){
+                        updateAdvancementTimer(time);
+                        hasUpdatedAdvancementTimer = true;
+                    }
 
                     if (shotSpeedState == ShotSpeedState.close || shotSpeedState == ShotSpeedState.undefined) {
+
                         if (!hasUpdatedAdjusterTimer) {
                             updateAdjusterTimer(time);
                             hasUpdatedAdjusterTimer = true;
@@ -122,6 +130,7 @@ public class ArmController {
                 break;
             case closeShot:
                 dcIntakeSpeed = dcIntakeSpeedOuttake;
+                advancementServoSpeed = advancementServoSpeedOuttake;
                 shotSpeed = shotSpeedOuttake;
                 if (!hasUpdatedOuttakeTimer) {
                     updateOuttakeTimer(time);
@@ -156,9 +165,9 @@ public class ArmController {
                 dcIntakeSpeed = dcIntakeSpeedOn;
                 break;
             case outtake:
-                shotSpeed = shotSpeedOff;
-                advancementServoSpeed = -advancementServoSpeedOn;
-                dcIntakeSpeed = -dcIntakeSpeedOn;
+                shotSpeed = shotSpeedOuttake;
+                advancementServoSpeed = advancementServoSpeedOuttake;
+                dcIntakeSpeed = dcIntakeSpeedOuttake;
                 break;
 
         }
@@ -181,6 +190,8 @@ public class ArmController {
         adjusterTimer = time + adjustWaitTime;}
     void updateOuttakeTimer(long time){
         outtakeTimer = time + outtakeWaitTime;}
+    void updateAdvancementTimer(long time){
+        advancementTimer = time + advancementWaitTime;}
 
 
 }
