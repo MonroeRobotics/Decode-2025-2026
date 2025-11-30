@@ -14,7 +14,7 @@ public class ArmController {
     }
     HardwareMap hardwareMap;
 
-    public final double closeShotSpeed = 0.45;
+    public final double closeShotSpeed = 0.42;
     public final double farShotSpeed = 1; //placeholder
     public final double shotSpeedOff = 0;
     public final double shotSpeedOuttake = -0.05;
@@ -47,8 +47,8 @@ public class ArmController {
     long advancementTimer;
     long outtakeTimer;
     long adjustWaitTime = 500; //time in milliseconds
-    long outtakeWaitTime = 750;
-    long advancementWaitTime = 250;
+    long outtakeWaitTime = 900;
+    long advancementWaitTime = 500;
     public boolean hasUpdatedAdjusterTimer = false;
     public boolean hasUpdatedAdvancementTimer = false;
     public boolean hasUpdatedOuttakeTimer = false;
@@ -70,8 +70,8 @@ public class ArmController {
         advancementServo = hardwareMap.get(CRServo.class, "advancementServo");
 
         //Making all motors brake when not powered.
-        launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        launchMotorR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        launchMotorR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //Makes the motors more precise with high speeds.
@@ -139,23 +139,29 @@ public class ArmController {
                 if (time >= outtakeTimer) {
                     dcIntakeSpeed = dcIntakeSpeedOn;
                     advancementServoSpeed = advancementServoSpeedOff;
-                    shotSpeed = shotSpeedOff;
-                    //adjust ramp angle
-                    if (shotSpeedState == ShotSpeedState.far || shotSpeedState == ShotSpeedState.undefined) {
-                        if (!hasUpdatedAdjusterTimer) {
-                            updateAdjusterTimer(time);
-                            hasUpdatedAdjusterTimer = true;
+                    shotSpeed = closeShotSpeed;
+                    if (!hasUpdatedAdvancementTimer) {
+                        updateAdvancementTimer(time);
+                        hasUpdatedAdvancementTimer = true;
+                    }
+                    if (time >= advancementTimer) {
+                        //adjust
+                        if (shotSpeedState == ShotSpeedState.far || shotSpeedState == ShotSpeedState.undefined) {
+                            if (!hasUpdatedAdjusterTimer) {
+                                updateAdjusterTimer(time);
+                                hasUpdatedAdjusterTimer = true;
+                            }
+                            if (time >= adjusterTimer) {
+                                advancementServoSpeed = advancementServoSpeedOn;
+                                shotSpeed = closeShotSpeed;
+                                shotSpeedState = ShotSpeedState.close;
+                            }
                         }
-                        if (time >= adjusterTimer) {
+                        else {
                             advancementServoSpeed = advancementServoSpeedOn;
                             shotSpeed = closeShotSpeed;
                             shotSpeedState = ShotSpeedState.close;
                         }
-                    }
-                    else {
-                        advancementServoSpeed = advancementServoSpeedOn;
-                        shotSpeed = closeShotSpeed;
-                        shotSpeedState = ShotSpeedState.close;
                     }
                 }
                 break;

@@ -55,13 +55,13 @@ public class drive extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.left_stick_x >= 0.2 || gamepad1.left_stick_x <= -0.2) {
-            xPower = -gamepad1.left_stick_x;
+        if (gamepad1.left_stick_x >= 0.05 || gamepad1.left_stick_x <= -0.05) {
+            yPower = -gamepad1.left_stick_x;
         }
-        if (gamepad1.left_stick_y >= 0.2 || gamepad1.left_stick_y <= -0.2) {
-            yPower = -gamepad1.left_stick_y;
+        if (gamepad1.left_stick_y >= 0.05 || gamepad1.left_stick_y <= -0.05) {
+            xPower = -gamepad1.left_stick_y;
         }
-        if (gamepad1.right_stick_x >= 0.2 || gamepad1.right_stick_x <= -0.2){
+        if (gamepad1.right_stick_x >= 0.05 || gamepad1.right_stick_x <= -0.05){
             headingPower = -gamepad1.right_stick_x;
         }
 
@@ -73,6 +73,7 @@ public class drive extends OpMode {
         if (gamepad1.right_bumper && !previousGamepad.right_bumper){
             armController.hasUpdatedOuttakeTimer = false;
             armController.hasUpdatedAdjusterTimer = false;
+            armController.hasUpdatedAdvancementTimer = false;
             if (!closeShotOn) {
                 armController.currentArmState = ArmController.armState.closeShot;
                 closeShotOn = true;
