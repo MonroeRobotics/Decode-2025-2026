@@ -116,9 +116,9 @@ public class drive extends OpMode {
         }
 
         Vector2d gamepadInput = new Vector2d(xPower, yPower);
-        PoseVelocity2d mechanumMotorPowers = new PoseVelocity2d(gamepadInput, headingPower);
+        PoseVelocity2d mecanumMotorPowers = new PoseVelocity2d(gamepadInput, headingPower);
 
-        mecanumDrive.setDrivePowers(mechanumMotorPowers);
+        mecanumDrive.setDrivePowers(mecanumMotorPowers);
 
         armController.updateArmState(System.currentTimeMillis());
 
