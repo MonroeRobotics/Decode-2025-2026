@@ -17,8 +17,16 @@ public class MeepMeepTesting {
         Vector2d bluePark = new Vector2d(37.5, 32); //90
 
         Vector2d redFarShot = new Vector2d(56, 12); //157
+        Vector2d redCloseShot  = new Vector2d(-51.5, 46.5); //130
+        Vector2d redCloseShotTransition = new Vector2d(-49, 44); //130
         Vector2d redHumanPlayer = new Vector2d(56, 54); //0
         Vector2d redPark = new Vector2d(37.5, -32); //90
+        Vector2d redPickupLineup1 = new Vector2d(35.5, 32); //90
+        Vector2d redPickupLineup2 = new Vector2d(11.5, 32); //90
+        Vector2d redPickupLineup3 = new Vector2d(-12, 32); //90
+        Vector2d redPickup1 = new Vector2d(35.5, 50); //90
+        Vector2d redPickup2 = new Vector2d(11.5, 50); //90
+        Vector2d redPickup3 = new Vector2d(-12, 50); //90
 
 
 
@@ -52,26 +60,36 @@ public class MeepMeepTesting {
                 .build());
         redBot.runAction(redBot.getDrive().actionBuilder(new Pose2d(redStart, Math.toRadians(180)))
                 .waitSeconds(2)
-                .strafeToLinearHeading(redFarShot, Math.toRadians(180))
-                .turnTo(Math.toRadians(90))
-                .strafeToLinearHeading(redHumanPlayer, Math.toRadians(90))
-                .strafeToLinearHeading(redFarShot, Math.toRadians(157))
+                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
+                .strafeToLinearHeading(redPickup1, Math.toRadians(90))
+                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
+                .turnTo(Math.toRadians(270))
+                .splineTo(redCloseShot, Math.toRadians(130))
                 .waitSeconds(2)
-                .turnTo(Math.toRadians(90))
-                .strafeToLinearHeading(redHumanPlayer, Math.toRadians(90))
-                .strafeToLinearHeading(redFarShot, Math.toRadians(157))
+                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
+                .turnTo(Math.toRadians(315))
+                .splineTo(redPickupLineup2, Math.toRadians(90))
+                .strafeToLinearHeading(redPickup2, Math.toRadians(90))
+                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
+                .turnTo(Math.toRadians(270))
+                .splineTo(redCloseShot, Math.toRadians(130))
                 .waitSeconds(2)
-                .turnTo(Math.toRadians(90))
-                .strafeToLinearHeading(redHumanPlayer, Math.toRadians(90))
-                .strafeToLinearHeading(redFarShot, Math.toRadians(157))
+                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
+                .turnTo(Math.toRadians(315))
+                .splineTo(redPickupLineup3, Math.toRadians(90))
+                .strafeToLinearHeading(redPickup3, Math.toRadians(90))
+                .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
+                .turnTo(Math.toRadians(270))
+                .splineTo(redCloseShot, Math.toRadians(130))
                 .waitSeconds(2)
-                .strafeToLinearHeading(redPark, Math.toRadians(180))
+                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
+                .turnTo(Math.toRadians(315))
+                .strafeToLinearHeading(redPark, 0)
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(blueBot)
                 .addEntity(redBot)
                 .start();
     }
