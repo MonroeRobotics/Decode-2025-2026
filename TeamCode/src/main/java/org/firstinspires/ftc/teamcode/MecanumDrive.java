@@ -72,7 +72,7 @@ public final class MecanumDrive {
         // feedforward parameters (in tick units)
         public double kS = 0.0002693777121109914;
         public double kV =  1.4859858291607546;
-        public double kA = 0.000001;
+        public double kA = 0.00005;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -237,7 +237,6 @@ public final class MecanumDrive {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html

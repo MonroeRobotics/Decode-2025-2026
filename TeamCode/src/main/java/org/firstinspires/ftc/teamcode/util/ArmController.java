@@ -138,7 +138,7 @@ public class ArmController {
                 }
                 if (time >= outtakeTimer) {
                     dcIntakeSpeed = dcIntakeSpeedOn;
-                    advancementServoSpeed = advancementServoSpeedOff;
+                    advancementServoSpeed = advancementServoSpeedOuttake;
                     shotSpeed = closeShotSpeed;
                     if (!hasUpdatedAdvancementTimer) {
                         updateAdvancementTimer(time);
