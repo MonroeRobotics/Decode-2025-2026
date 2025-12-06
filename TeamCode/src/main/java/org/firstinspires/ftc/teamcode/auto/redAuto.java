@@ -31,9 +31,8 @@ public class redAuto extends LinearOpMode{
         shoot
 
     }
-    Action path;
 
-    Pose2d blueStart = new Pose2d(60,-12, Math.toRadians(90)); //90
+    Pose2d blueStart = new Pose2d(60,-12, Math.toRadians(180)); //90
     Pose2d redStart = new Pose2d(60, 12, Math.toRadians(180)); //90
 
     Vector2d blueFarShot = new Vector2d(56,-12); //203
@@ -63,10 +62,34 @@ public class redAuto extends LinearOpMode{
         previousGamepad = new Gamepad();
         mecanumDrive = new MecanumDrive(hardwareMap, redStart);
 
-        path = mecanumDrive.actionBuilder(redStart)
-                .strafeToLinearHeading(new Vector2d(0, 12), Math.toRadians(180)).build();
+        TrajectoryActionBuilder path = mecanumDrive.actionBuilder(redStart)
+                .waitSeconds(2)
+                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
+                .strafeToLinearHeading(redPickup1, Math.toRadians(90))
+                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
+                .strafeToLinearHeading(redCloseShot, Math.toRadians(130))
+                .waitSeconds(2)
+                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
+                .turnTo(Math.toRadians(315))
+                .splineTo(redPickupLineup2, Math.toRadians(90))
+                .strafeToLinearHeading(redPickup2, Math.toRadians(90))
+                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
+                .turnTo(Math.toRadians(270))
+                .splineTo(redCloseShot, Math.toRadians(130))
+                .waitSeconds(2)
+                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
+                .turnTo(Math.toRadians(315))
+                .splineTo(redPickupLineup3, Math.toRadians(90))
+                .strafeToLinearHeading(redPickup3, Math.toRadians(90))
+                .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
+                .turnTo(Math.toRadians(270))
+                .splineTo(redCloseShot, Math.toRadians(130))
+                .waitSeconds(2)
+                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
+                .turnTo(Math.toRadians(315));
 
-        Actions.runBlocking(new SequentialAction(path));
+        Action pathAction = path.build();
+        Actions.runBlocking(new SequentialAction(pathAction));
 
     }
 }
