@@ -74,7 +74,10 @@ public class redAuto extends LinearOpMode{
         armController.initArm();
 
         previousGamepad = new Gamepad();
-        mecanumDrive = new MecanumDrive(hardwareMap, redStart);
+
+        while (opModeInInit()){
+            mecanumDrive = new MecanumDrive(hardwareMap, redStart);
+        }
 
         while (opModeIsActive()){
             switch (autoState){
