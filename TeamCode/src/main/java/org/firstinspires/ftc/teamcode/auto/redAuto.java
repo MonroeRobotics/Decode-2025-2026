@@ -19,8 +19,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
         import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ArmController;
 
-@Config
 @Autonomous(name = "red auto", group = "Autonomous")
+@Config
 public class redAuto extends LinearOpMode{
     ArmController armController;
     Gamepad previousGamepad;
@@ -79,6 +79,7 @@ public class redAuto extends LinearOpMode{
             mecanumDrive = new MecanumDrive(hardwareMap, redStart);
         }
 
+        waitForStart();
         while (opModeIsActive()){
             switch (autoState){
                 case PICKUP:
@@ -89,26 +90,23 @@ public class redAuto extends LinearOpMode{
                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup2, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90));
-                        Action toPickup2Action = toPickup2.build();
-                        Actions.runBlocking(new SequentialAction(toPickup2Action));
+                        Actions.runBlocking(toPickup1.build());
                         autoState = AutoState.SHOT_APPROACH;
                     }
                     else if (cycleNumber == 2) {
-                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                        toPickup2 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90));
-                        Action toPickup3Action = toPickup3.build();
-                        Actions.runBlocking(new SequentialAction(toPickup3Action));
+                        Actions.runBlocking(toPickup2.build());
                         autoState = AutoState.SHOT_APPROACH;
                     }
                     else if (cycleNumber == 3) {
-                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                        toPickup3 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup1, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90));
-                        Action toPickup1Action = toPickup1.build();
-                        Actions.runBlocking(new SequentialAction(toPickup1Action));
+                        Actions.runBlocking(toPickup3.build());
                         autoState = AutoState.SHOT_APPROACH;
                     }
                     break;
@@ -122,6 +120,7 @@ public class redAuto extends LinearOpMode{
                     break;
                 case SHOT:
                     armController.currentArmState = ArmController.armState.closeShot;
+                    armController.updateArmState(System.currentTimeMillis());
                     if (!shotTimerStarted){
                         waitTimer = System.currentTimeMillis() + 2000; //2 seconds
                         shotTimerStarted = true;
