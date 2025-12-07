@@ -26,12 +26,6 @@ public class redAuto extends LinearOpMode{
     Gamepad previousGamepad;
 
     MecanumDrive mecanumDrive;
-    enum autoState{
-        start,
-        shoot
-
-    }
-
     Pose2d blueStart = new Pose2d(60,-12, Math.toRadians(180)); //90
     Pose2d redStart = new Pose2d(60, 12, Math.toRadians(180)); //90
 
@@ -50,6 +44,26 @@ public class redAuto extends LinearOpMode{
     Vector2d redPickup1 = new Vector2d(35.5, 50); //90
     Vector2d redPickup2 = new Vector2d(11.5, 50); //90
     Vector2d redPickup3 = new Vector2d(-12, 50); //90
+    enum AutoState{
+        PICKUP,
+        SHOT_APPROACH,
+        SHOT,
+        SHOT_LEAVE,
+        STOP
+
+    }
+    AutoState autoState = AutoState.PICKUP;
+    double cycleNumber = 1;
+    double waitTimer;
+    boolean shotTimerStarted = false;
+
+    TrajectoryActionBuilder toPickup1;
+    TrajectoryActionBuilder toPickup2;
+    TrajectoryActionBuilder toPickup3;
+
+    TrajectoryActionBuilder toShot;
+    TrajectoryActionBuilder toShotLeave;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -62,34 +76,75 @@ public class redAuto extends LinearOpMode{
         previousGamepad = new Gamepad();
         mecanumDrive = new MecanumDrive(hardwareMap, redStart);
 
-        TrajectoryActionBuilder path = mecanumDrive.actionBuilder(redStart)
-                .waitSeconds(2)
-                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
-                .strafeToLinearHeading(redPickup1, Math.toRadians(90))
-                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
-                .strafeToLinearHeading(redCloseShot, Math.toRadians(130))
-                .waitSeconds(2)
-                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
-                .turnTo(Math.toRadians(315))
-                .splineTo(redPickupLineup2, Math.toRadians(90))
-                .strafeToLinearHeading(redPickup2, Math.toRadians(90))
-                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
-                .turnTo(Math.toRadians(270))
-                .splineTo(redCloseShot, Math.toRadians(130))
-                .waitSeconds(2)
-                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
-                .turnTo(Math.toRadians(315))
-                .splineTo(redPickupLineup3, Math.toRadians(90))
-                .strafeToLinearHeading(redPickup3, Math.toRadians(90))
-                .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
-                .turnTo(Math.toRadians(270))
-                .splineTo(redCloseShot, Math.toRadians(130))
-                .waitSeconds(2)
-                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(135))
-                .turnTo(Math.toRadians(315));
+        while (opModeIsActive()){
+            switch (autoState){
+                case PICKUP:
+                    armController.currentArmState = ArmController.armState.intake;
+                    armController.updateArmState(System.currentTimeMillis());
+                     if (cycleNumber == 1) {
+                         toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
+                                 .strafeToLinearHeading(redPickup2, Math.toRadians(90))
+                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90));
+                         Action toPickup2Action = toPickup2.build();
+                         Actions.runBlocking(new SequentialAction(toPickup2Action));
+                         autoState = AutoState.SHOT_APPROACH;
+                     }
+                    else if (cycleNumber == 2){
+                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickup1, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90));
+                        Action toPickup1Action = toPickup1.build();
+                        Actions.runBlocking(new SequentialAction(toPickup1Action));
+                        autoState = AutoState.SHOT_APPROACH;
+                    }
+                    else if (cycleNumber == 3){
+                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                                .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickup3, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90));
+                        Action toPickup3Action = toPickup3.build();
+                        Actions.runBlocking(new SequentialAction(toPickup3Action));
+                        autoState = AutoState.SHOT_APPROACH;
+                    }
+                    break;
+                case SHOT_APPROACH:
+                    toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .turnTo(270)
+                            .splineTo(redCloseShot, Math.toRadians(130));
+                    Action toShotAction =  toShot.build();
+                    Actions.runBlocking(new SequentialAction(toShotAction));
+                    autoState = AutoState.SHOT;
+                    break;
+                case SHOT:
+                    armController.currentArmState = ArmController.armState.closeShot;
+                    if (!shotTimerStarted){
+                        waitTimer = System.currentTimeMillis() + 2000; //2 seconds
+                        shotTimerStarted = true;
+                    }
+                    if (System.currentTimeMillis() >= waitTimer){
+                        armController.currentArmState = ArmController.armState.rest;
+                        autoState = AutoState.SHOT_LEAVE;
+                        armController.updateArmState(System.currentTimeMillis());
+                    }
+                case SHOT_LEAVE:
+                    toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(130))
+                            .turnTo(Math.toRadians(315));
+                    Action toShotLeaveAction = toShotLeave.build();
+                    Actions.runBlocking(new SequentialAction(toShotLeaveAction));
+                    if (cycleNumber < 3){
+                        cycleNumber += 1;
+                        autoState = AutoState.PICKUP;
+                    }
+                    else{
+                        autoState = AutoState.STOP;
+                    }
+                case STOP:
+                    break;
 
-        Action pathAction = path.build();
-        Actions.runBlocking(new SequentialAction(pathAction));
-
+            }
+        }
     }
 }
