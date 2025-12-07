@@ -81,31 +81,31 @@ public class redAuto extends LinearOpMode{
                 case PICKUP:
                     armController.currentArmState = ArmController.armState.intake;
                     armController.updateArmState(System.currentTimeMillis());
-                     if (cycleNumber == 1) {
-                         toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
-                                 .strafeToLinearHeading(redPickup2, Math.toRadians(90))
-                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90));
-                         Action toPickup2Action = toPickup2.build();
-                         Actions.runBlocking(new SequentialAction(toPickup2Action));
-                         autoState = AutoState.SHOT_APPROACH;
-                     }
-                    else if (cycleNumber == 2){
+                    if (cycleNumber == 1) {
                         toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
-                                .strafeToLinearHeading(redPickup1, Math.toRadians(90))
-                                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90));
-                        Action toPickup1Action = toPickup1.build();
-                        Actions.runBlocking(new SequentialAction(toPickup1Action));
+                                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickup2, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90));
+                        Action toPickup2Action = toPickup2.build();
+                        Actions.runBlocking(new SequentialAction(toPickup2Action));
                         autoState = AutoState.SHOT_APPROACH;
                     }
-                    else if (cycleNumber == 3){
+                    else if (cycleNumber == 2) {
                         toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90));
                         Action toPickup3Action = toPickup3.build();
                         Actions.runBlocking(new SequentialAction(toPickup3Action));
+                        autoState = AutoState.SHOT_APPROACH;
+                    }
+                    else if (cycleNumber == 3) {
+                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickup1, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90));
+                        Action toPickup1Action = toPickup1.build();
+                        Actions.runBlocking(new SequentialAction(toPickup1Action));
                         autoState = AutoState.SHOT_APPROACH;
                     }
                     break;
