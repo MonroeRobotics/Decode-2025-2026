@@ -90,25 +90,21 @@ public class redAuto extends LinearOpMode{
                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup2, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90));
-                        Actions.runBlocking(toPickup1.build());
-                        autoState = AutoState.SHOT_APPROACH;
                     }
                     else if (cycleNumber == 2) {
                         toPickup2 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90));
-                        Actions.runBlocking(toPickup2.build());
-                        autoState = AutoState.SHOT_APPROACH;
                     }
                     else if (cycleNumber == 3) {
                         toPickup3 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup1, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90));
-                        Actions.runBlocking(toPickup3.build());
-                        autoState = AutoState.SHOT_APPROACH;
                     }
+                    Actions.runBlocking(toPickup1.build());
+                    autoState = AutoState.SHOT_APPROACH;
                     break;
                 case SHOT_APPROACH:
                     toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
