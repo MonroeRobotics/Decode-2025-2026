@@ -34,7 +34,7 @@ public class redAuto extends LinearOpMode{
     Vector2d bluePark = new Vector2d(37.5, 32); //90
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
-    Vector2d redCloseShot  = new Vector2d(-58, 49); //123
+    Vector2d redCloseShot  = new Vector2d(-58, 51.5); //123
     Vector2d redCloseShotAdvance  = new Vector2d(-58, 56.5); //123
 
     Vector2d redCloseShotTransition = new Vector2d(-14, 18); //123
