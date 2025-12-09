@@ -94,7 +94,12 @@ public class redAuto extends LinearOpMode{
         while (opModeIsActive()){
             switch (autoState){
                 case SHOT_APPROACH:
-                    armController.currentArmState = ArmController.armState.intake;
+                    if (cycleNumber == 1){
+                        armController.currentArmState = ArmController.armState.autoIntake;
+                    }
+                    else{
+                        armController.currentArmState = ArmController.armState.intake;
+                    }
                     armController.updateArmState(System.currentTimeMillis());
                     shotTimerStarted = false;
                     toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
@@ -130,7 +135,7 @@ public class redAuto extends LinearOpMode{
                         autoState = AutoState.SHOT_LEAVE;
                     }
                 case SHOT_LEAVE:
-                    if (cycleNumber < 1){ //change to 3 if doing full auto
+                    if (cycleNumber < 0){ //change to 3 if doing full auto
                         toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(123));
                         Actions.runBlocking(toShotLeave.build());

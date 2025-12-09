@@ -59,6 +59,7 @@ public class ArmController {
         farShot,
         closeShot,
         intake,
+        autoIntake,
         outtake
     }
     public armState currentArmState = armState.rest;
@@ -91,7 +92,7 @@ public class ArmController {
                 advancementServoSpeed = advancementServoSpeedOff;
                 shotSpeed = shotSpeedOff;
                 break;
-            case farShot:
+            case farShot: //todo add all the changes I did to close shot
                 dcIntakeSpeed = dcIntakeSpeedOuttake;
                 advancementServoSpeed = advancementServoSpeedOuttake;
                 shotSpeed = shotSpeedOuttake;
@@ -172,6 +173,10 @@ public class ArmController {
                 advancementServoSpeed = advancementServoSpeedOn;
                 dcIntakeSpeed = dcIntakeSpeedOn;
                 break;
+            case autoIntake:
+                shotSpeed = shotSpeedOff;
+                advancementServoSpeed = advancementServoSpeedOff;
+                dcIntakeSpeed = dcIntakeSpeedOn;
             case outtake:
                 shotSpeed = shotSpeedOuttake;
                 advancementServoSpeed = advancementServoSpeedOuttake;
