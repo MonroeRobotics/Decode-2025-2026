@@ -43,7 +43,7 @@ public class redAuto extends LinearOpMode{
     Vector2d redPickupLineup3 = new Vector2d(-12, 32); //90
     Vector2d redPickup1 = new Vector2d(35.5, 50); //90
     Vector2d redPickup2 = new Vector2d(11.5, 50); //90
-    Vector2d redPickup3 = new Vector2d(-12, 50); //90.0
+    Vector2d redPickup3 = new Vector2d(-12, 50); //90
     enum AutoState{
         PICKUP,
         SHOT_APPROACH,
