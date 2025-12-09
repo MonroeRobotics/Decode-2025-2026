@@ -177,6 +177,7 @@ public class ArmController {
                 shotSpeed = shotSpeedOff;
                 advancementServoSpeed = advancementServoSpeedOff;
                 dcIntakeSpeed = dcIntakeSpeedOn;
+                break;
             case outtake:
                 shotSpeed = shotSpeedOuttake;
                 advancementServoSpeed = advancementServoSpeedOuttake;
