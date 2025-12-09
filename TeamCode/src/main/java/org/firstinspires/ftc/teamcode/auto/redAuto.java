@@ -34,8 +34,8 @@ public class redAuto extends LinearOpMode{
     Vector2d bluePark = new Vector2d(37.5, 32); //90
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
-    Vector2d redCloseShot  = new Vector2d(-59, 48); //123
-    Vector2d redCloseShotAdvance  = new Vector2d(-59, 55); //123
+    Vector2d redCloseShot  = new Vector2d(-58, 49); //123
+    Vector2d redCloseShotAdvance  = new Vector2d(-58, 56.5); //123
 
     Vector2d redCloseShotTransition = new Vector2d(-14, 18); //123
     
@@ -54,7 +54,8 @@ public class redAuto extends LinearOpMode{
         SHOT_ADVANCE,
         SHOT_ADVANCE_SHOT,
         SHOT_LEAVE,
-        STOP
+        STOP,
+        TRUE_STOP
 
     }
     AutoState autoState = AutoState.SHOT_APPROACH;
@@ -62,6 +63,7 @@ public class redAuto extends LinearOpMode{
     double waitTimer;
     boolean shotTimerStarted = false;
     boolean shotAdvanceTimerStarted = false;
+    boolean happyDanceTimerStarted = false;
 
     TrajectoryActionBuilder toPickup1;
     TrajectoryActionBuilder toPickup2;
@@ -81,7 +83,7 @@ public class redAuto extends LinearOpMode{
 
         armController = new ArmController(hardwareMap);
 
-        armController.outtakeWaitTime = 1100;
+        armController.outtakeWaitTime = 1200;
 
         armController.initArm();
 
@@ -129,7 +131,7 @@ public class redAuto extends LinearOpMode{
                         waitTimer = System.currentTimeMillis() + 3000;
                         shotAdvanceTimerStarted = true;
                     }
-                    if (System.currentTimeMillis() > waitTimer){
+                    if (System.currentTimeMillis() >= waitTimer){
                         armController.currentArmState = ArmController.armState.rest;
                         armController.updateArmState(System.currentTimeMillis());
                         autoState = AutoState.SHOT_LEAVE;
@@ -186,6 +188,15 @@ public class redAuto extends LinearOpMode{
                     toStop = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                             .strafeToLinearHeading(redStop, Math.toRadians(90));
                     Actions.runBlocking(toStop.build());
+                    if (!happyDanceTimerStarted){
+                        waitTimer = System.currentTimeMillis() + 3000;
+                        happyDanceTimerStarted = true;
+                    }
+                    if (System.currentTimeMillis() >= waitTimer){
+                        autoState = AutoState.TRUE_STOP;
+                    }
+                    break;
+                case TRUE_STOP:
                     break;
             }
             armController.updateArmState(System.currentTimeMillis());
