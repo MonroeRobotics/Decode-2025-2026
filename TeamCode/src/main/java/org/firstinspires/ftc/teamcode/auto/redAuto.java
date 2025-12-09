@@ -34,8 +34,8 @@ public class redAuto extends LinearOpMode{
     Vector2d bluePark = new Vector2d(37.5, 32); //90
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
-    Vector2d redCloseShot  = new Vector2d(-57.5, 47); //126.3
-    Vector2d redCloseShotTransition = new Vector2d(-45.5, 41.5); //126.3
+    Vector2d redCloseShot  = new Vector2d(-58.5, 49); //126
+    Vector2d redCloseShotTransition = new Vector2d(-45.5, 41.5); //126
     Vector2d redHumanPlayer = new Vector2d(56, 54); //0
     Vector2d redPark = new Vector2d(37.5, -32); //90
     Vector2d redPickupLineup1 = new Vector2d(35.5, 32); //90
@@ -88,7 +88,7 @@ public class redAuto extends LinearOpMode{
                     armController.updateArmState(System.currentTimeMillis());
                     shotTimerStarted = false;
                     toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(redCloseShot, Math.toRadians(126.3));
+                            .strafeToLinearHeading(redCloseShot, Math.toRadians(126));
                     Actions.runBlocking(toShot.build());
                     autoState = AutoState.SHOT;
                     break;
@@ -108,7 +108,7 @@ public class redAuto extends LinearOpMode{
                     break;
                 case SHOT_LEAVE:
                     toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(126.3));
+                            .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(126));
                     Actions.runBlocking(toShotLeave.build());
                     if (cycleNumber < 3){
                         cycleNumber += 1;
