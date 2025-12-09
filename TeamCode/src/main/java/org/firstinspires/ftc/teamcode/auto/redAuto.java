@@ -34,7 +34,9 @@ public class redAuto extends LinearOpMode{
     Vector2d bluePark = new Vector2d(37.5, 32); //90
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
-    Vector2d redCloseShot  = new Vector2d(-58.5, 50.5); //123
+    Vector2d redCloseShot  = new Vector2d(-58.5, 48); //123
+    Vector2d redCloseShotAdvance  = new Vector2d(-58.5, 50); //123
+
     Vector2d redCloseShotTransition = new Vector2d(-14, 18); //123
     
     Vector2d redHumanPlayer = new Vector2d(56, 54); //0
@@ -49,6 +51,8 @@ public class redAuto extends LinearOpMode{
         PICKUP,
         SHOT_APPROACH,
         SHOT,
+        SHOT_ADVANCE,
+        SHOT_ADVANCE_SHOT,
         SHOT_LEAVE,
         STOP
 
@@ -57,6 +61,7 @@ public class redAuto extends LinearOpMode{
     double cycleNumber = 1;
     double waitTimer;
     boolean shotTimerStarted = false;
+    boolean shotAdvanceTimerStarted = false;
 
     TrajectoryActionBuilder toPickup1;
     TrajectoryActionBuilder toPickup2;
@@ -64,6 +69,7 @@ public class redAuto extends LinearOpMode{
     TrajectoryActionBuilder toTurn;
 
     TrajectoryActionBuilder toShot;
+    TrajectoryActionBuilder toShotAdvance;
     TrajectoryActionBuilder toShotLeave;
     
     TrajectoryActionBuilder toStop;
@@ -101,15 +107,28 @@ public class redAuto extends LinearOpMode{
                     armController.updateArmState(System.currentTimeMillis());
 
                     if (!shotTimerStarted){
-                        waitTimer = System.currentTimeMillis() + 7000; //2 seconds
+                        waitTimer = System.currentTimeMillis() + 4000; //2 seconds
                         shotTimerStarted = true;
                     }
                     if (System.currentTimeMillis() >= waitTimer){
+                        autoState = AutoState.SHOT_ADVANCE;
+                    }
+                    break;
+                case SHOT_ADVANCE:
+                    toShotAdvance = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .strafeToLinearHeading(redCloseShotAdvance, Math.toRadians(123));
+                    Actions.runBlocking(toShotAdvance.build());
+                    autoState = AutoState.SHOT_ADVANCE_SHOT;
+                case SHOT_ADVANCE_SHOT:
+                    if (!shotAdvanceTimerStarted){
+                        waitTimer = System.currentTimeMillis() + 3000;
+                        shotAdvanceTimerStarted = true;
+                    }
+                    if (System.currentTimeMillis() > waitTimer){
                         armController.currentArmState = ArmController.armState.rest;
                         armController.updateArmState(System.currentTimeMillis());
                         autoState = AutoState.SHOT_LEAVE;
                     }
-                    break;
                 case SHOT_LEAVE:
                     if (cycleNumber < 1){ //change to 3 if doing full auto
                         toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
@@ -117,6 +136,7 @@ public class redAuto extends LinearOpMode{
                         Actions.runBlocking(toShotLeave.build());
                         cycleNumber += 1;
                         shotTimerStarted = false;
+                        shotAdvanceTimerStarted = false;
                         armController.hasUpdatedOuttakeTimer = false;
                         armController.hasUpdatedAdjusterTimer = false;
                         armController.hasUpdatedAdvancementTimer = false;
