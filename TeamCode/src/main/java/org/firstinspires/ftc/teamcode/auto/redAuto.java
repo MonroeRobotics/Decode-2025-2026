@@ -16,11 +16,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-        import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ArmController;
 
-@Autonomous(name = "red auto", group = "Autonomous")
 @Config
+@Autonomous(name = "red auto", group = "Autonomous")
 public class redAuto extends LinearOpMode{
     ArmController armController;
     Gamepad previousGamepad;
@@ -52,7 +52,7 @@ public class redAuto extends LinearOpMode{
         STOP
 
     }
-    AutoState autoState = AutoState.PICKUP;
+    AutoState autoState = AutoState.SHOT_APPROACH;
     double cycleNumber = 1;
     double waitTimer;
     boolean shotTimerStarted = false;
@@ -79,12 +79,52 @@ public class redAuto extends LinearOpMode{
             mecanumDrive = new MecanumDrive(hardwareMap, redStart);
         }
 
-        waitForStart();
         while (opModeIsActive()){
             switch (autoState){
+                case SHOT_APPROACH:
+                    armController.currentArmState = ArmController.armState.closeShot;
+                    armController.updateArmState(System.currentTimeMillis());
+                    shotTimerStarted = false;
+                    toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .strafeToLinearHeading(redCloseShot, Math.toRadians(130));
+                    Actions.runBlocking(toShot.build());
+                    autoState = AutoState.SHOT;
+                    break;
+                case SHOT:
+                    armController.currentArmState = ArmController.armState.closeShot;
+                    armController.updateArmState(System.currentTimeMillis());
+
+                    if (!shotTimerStarted){
+                        waitTimer = System.currentTimeMillis() + 4000; //2 seconds
+                        shotTimerStarted = true;
+                    }
+                    if (System.currentTimeMillis() >= waitTimer){
+                        armController.currentArmState = ArmController.armState.rest;
+                        armController.updateArmState(System.currentTimeMillis());
+                        autoState = AutoState.SHOT_LEAVE;
+                    }
+                    break;
+                case SHOT_LEAVE:
+                    toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(130));
+                    Actions.runBlocking(toShotLeave.build());
+                    if (cycleNumber < 3){
+                        cycleNumber += 1;
+                        shotTimerStarted = false;
+                        armController.hasUpdatedOuttakeTimer = false;
+                        armController.hasUpdatedAdjusterTimer = false;
+                        armController.hasUpdatedAdvancementTimer = false;
+                        autoState = AutoState.PICKUP;
+                    }
+                    else{
+                        autoState = AutoState.STOP;
+                    }
+                    break;
                 case PICKUP:
                     armController.currentArmState = ArmController.armState.intake;
                     armController.updateArmState(System.currentTimeMillis());
+
+                    // Build the correct trajectory depending on the cycle
                     if (cycleNumber == 1) {
                         toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
@@ -92,57 +132,26 @@ public class redAuto extends LinearOpMode{
                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90));
                     }
                     else if (cycleNumber == 2) {
-                        toPickup2 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup3, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup3, Math.toRadians(90));
                     }
                     else if (cycleNumber == 3) {
-                        toPickup3 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                                 .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickup1, Math.toRadians(90))
                                 .strafeToLinearHeading(redPickupLineup1, Math.toRadians(90));
                     }
+
+                    // RUN the built trajectory
                     Actions.runBlocking(toPickup1.build());
                     autoState = AutoState.SHOT_APPROACH;
                     break;
-                case SHOT_APPROACH:
-                    toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .turnTo(270)
-                            .splineTo(redCloseShot, Math.toRadians(130));
-                    Action toShotAction =  toShot.build();
-                    Actions.runBlocking(new SequentialAction(toShotAction));
-                    autoState = AutoState.SHOT;
-                    break;
-                case SHOT:
-                    armController.currentArmState = ArmController.armState.closeShot;
-                    armController.updateArmState(System.currentTimeMillis());
-                    if (!shotTimerStarted){
-                        waitTimer = System.currentTimeMillis() + 2000; //2 seconds
-                        shotTimerStarted = true;
-                    }
-                    if (System.currentTimeMillis() >= waitTimer){
-                        armController.currentArmState = ArmController.armState.rest;
-                        autoState = AutoState.SHOT_LEAVE;
-                        armController.updateArmState(System.currentTimeMillis());
-                    }
-                case SHOT_LEAVE:
-                    toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(130))
-                            .turnTo(Math.toRadians(315));
-                    Action toShotLeaveAction = toShotLeave.build();
-                    Actions.runBlocking(new SequentialAction(toShotLeaveAction));
-                    if (cycleNumber < 3){
-                        cycleNumber += 1;
-                        autoState = AutoState.PICKUP;
-                    }
-                    else{
-                        autoState = AutoState.STOP;
-                    }
                 case STOP:
                     break;
-
             }
+            armController.updateArmState(System.currentTimeMillis());
         }
     }
 }

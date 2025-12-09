@@ -152,12 +152,14 @@ public class ArmController {
                                 hasUpdatedAdjusterTimer = true;
                             }
                             if (time >= adjusterTimer) {
+                                dcIntakeSpeed = dcIntakeSpeedOn;
                                 advancementServoSpeed = advancementServoSpeedOn;
                                 shotSpeed = closeShotSpeed;
                                 shotSpeedState = ShotSpeedState.close;
                             }
                         }
                         else {
+                            dcIntakeSpeed = dcIntakeSpeedOn;
                             advancementServoSpeed = advancementServoSpeedOn;
                             shotSpeed = closeShotSpeed;
                             shotSpeedState = ShotSpeedState.close;
