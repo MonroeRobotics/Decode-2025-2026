@@ -47,7 +47,7 @@ public class ArmController {
     long advancementTimer;
     long outtakeTimer;
     long adjustWaitTime = 500; //time in milliseconds
-    long outtakeWaitTime = 900;
+    public long outtakeWaitTime = 900;
     long advancementWaitTime = 500;
     public boolean hasUpdatedAdjusterTimer = false;
     public boolean hasUpdatedAdvancementTimer = false;
