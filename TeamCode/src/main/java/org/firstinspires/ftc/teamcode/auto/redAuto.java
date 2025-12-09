@@ -84,7 +84,7 @@ public class redAuto extends LinearOpMode{
         while (opModeIsActive()){
             switch (autoState){
                 case SHOT_APPROACH:
-                    armController.currentArmState = ArmController.armState.closeShot;
+                    armController.currentArmState = ArmController.armState.intake;
                     armController.updateArmState(System.currentTimeMillis());
                     shotTimerStarted = false;
                     toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
