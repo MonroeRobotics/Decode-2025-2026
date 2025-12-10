@@ -4,9 +4,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 
@@ -35,7 +33,7 @@ public class redAuto extends LinearOpMode{
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
     Vector2d redCloseShot  = new Vector2d(-58, 51.5); //123
-    Vector2d redCloseShotAdvance  = new Vector2d(-58, 56.5); //123
+    Vector2d redCloseShotAdvance  = new Vector2d(-58, 57); //123
 
     Vector2d redCloseShotTransition = new Vector2d(-14, 18); //123
     
@@ -60,7 +58,8 @@ public class redAuto extends LinearOpMode{
     }
     AutoState autoState = AutoState.SHOT_APPROACH;
     double cycleNumber = 1;
-    double waitTimer;
+    long shotWaitTimer;
+    long advanceWaitTimer;
     boolean shotTimerStarted = false;
     boolean shotAdvanceTimerStarted = false;
     boolean happyDanceTimerStarted = false;
@@ -83,7 +82,7 @@ public class redAuto extends LinearOpMode{
 
         armController = new ArmController(hardwareMap);
 
-        armController.outtakeWaitTime = 1200;
+        armController.outtakeWaitTime = 1150;
 
         armController.initArm();
 
@@ -114,10 +113,10 @@ public class redAuto extends LinearOpMode{
                     armController.updateArmState(System.currentTimeMillis());
 
                     if (!shotTimerStarted){
-                        waitTimer = System.currentTimeMillis() + 4000; //2 seconds
+                        shotWaitTimer = System.currentTimeMillis() + 4000; //2 seconds
                         shotTimerStarted = true;
                     }
-                    if (System.currentTimeMillis() >= waitTimer){
+                    if (System.currentTimeMillis() >= shotWaitTimer){
                         autoState = AutoState.SHOT_ADVANCE;
                     }
                     break;
@@ -128,10 +127,10 @@ public class redAuto extends LinearOpMode{
                     autoState = AutoState.SHOT_ADVANCE_SHOT;
                 case SHOT_ADVANCE_SHOT:
                     if (!shotAdvanceTimerStarted){
-                        waitTimer = System.currentTimeMillis() + 3000;
+                        advanceWaitTimer = System.currentTimeMillis() + 3000;
                         shotAdvanceTimerStarted = true;
                     }
-                    if (System.currentTimeMillis() >= waitTimer){
+                    if (System.currentTimeMillis() >= advanceWaitTimer){
                         armController.currentArmState = ArmController.armState.rest;
                         armController.updateArmState(System.currentTimeMillis());
                         autoState = AutoState.SHOT_LEAVE;
@@ -189,10 +188,10 @@ public class redAuto extends LinearOpMode{
                             .strafeToLinearHeading(redStop, Math.toRadians(90));
                     Actions.runBlocking(toStop.build());
                     if (!happyDanceTimerStarted){
-                        waitTimer = System.currentTimeMillis() + 3000;
+                        shotWaitTimer = System.currentTimeMillis() + 3000;
                         happyDanceTimerStarted = true;
                     }
-                    if (System.currentTimeMillis() >= waitTimer){
+                    if (System.currentTimeMillis() >= shotWaitTimer){
                         autoState = AutoState.TRUE_STOP;
                     }
                     break;
