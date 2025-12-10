@@ -32,8 +32,8 @@ public class redAuto extends LinearOpMode{
     Vector2d bluePark = new Vector2d(37.5, 32); //90
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
-    Vector2d redCloseShot  = new Vector2d(-58, 51.5); //123
-    Vector2d redCloseShotAdvance  = new Vector2d(-58, 57); //123
+    Vector2d redCloseShot  = new Vector2d(-60, 52); //123
+    Vector2d redCloseShotAdvance  = new Vector2d(-60, 56); //123
 
     Vector2d redCloseShotTransition = new Vector2d(-14, 18); //123
     
@@ -82,7 +82,7 @@ public class redAuto extends LinearOpMode{
 
         armController = new ArmController(hardwareMap);
 
-        armController.outtakeWaitTime = 1150;
+        armController.outtakeWaitTime = 1100;
 
         armController.initArm();
 
@@ -125,9 +125,10 @@ public class redAuto extends LinearOpMode{
                             .strafeToLinearHeading(redCloseShotAdvance, Math.toRadians(123));
                     Actions.runBlocking(toShotAdvance.build());
                     autoState = AutoState.SHOT_ADVANCE_SHOT;
+                    break;
                 case SHOT_ADVANCE_SHOT:
                     if (!shotAdvanceTimerStarted){
-                        advanceWaitTimer = System.currentTimeMillis() + 3000;
+                        advanceWaitTimer = System.currentTimeMillis() + 4000;
                         shotAdvanceTimerStarted = true;
                     }
                     if (System.currentTimeMillis() >= advanceWaitTimer){
@@ -135,6 +136,7 @@ public class redAuto extends LinearOpMode{
                         armController.updateArmState(System.currentTimeMillis());
                         autoState = AutoState.SHOT_LEAVE;
                     }
+                    break;
                 case SHOT_LEAVE:
                     if (cycleNumber < 0){ //change to 3 if doing full auto
                         toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
@@ -187,13 +189,7 @@ public class redAuto extends LinearOpMode{
                     toStop = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                             .strafeToLinearHeading(redStop, Math.toRadians(90));
                     Actions.runBlocking(toStop.build());
-                    if (!happyDanceTimerStarted){
-                        shotWaitTimer = System.currentTimeMillis() + 3000;
-                        happyDanceTimerStarted = true;
-                    }
-                    if (System.currentTimeMillis() >= shotWaitTimer){
-                        autoState = AutoState.TRUE_STOP;
-                    }
+                    autoState = AutoState.TRUE_STOP;
                     break;
                 case TRUE_STOP:
                     break;
