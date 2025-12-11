@@ -147,7 +147,7 @@ public class redAuto extends LinearOpMode{
                         shotAdvanceTimerStarted = false;
                         armController.hasUpdatedOuttakeTimer = false;
                         armController.hasUpdatedAdjusterTimer = false;
-                        armController.hasUpdatedAdvancementTimer = false;
+                        armController.hasUpdatedSpinupTimer = false;
                         autoState = AutoState.PICKUP;
                     }
                     else{

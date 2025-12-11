@@ -48,9 +48,9 @@ public class ArmController {
     long outtakeTimer;
     long adjustWaitTime = 500; //time in milliseconds
     public long outtakeWaitTime = 900;
-    long advancementWaitTime = 650;
+    long spinupWaitTime = 650;
     public boolean hasUpdatedAdjusterTimer = false;
-    public boolean hasUpdatedAdvancementTimer = false;
+    public boolean hasUpdatedSpinupTimer = false;
     public boolean hasUpdatedOuttakeTimer = false;
 
 
@@ -71,8 +71,8 @@ public class ArmController {
         advancementServo = hardwareMap.get(CRServo.class, "advancementServo");
 
         //Making all motors brake when not powered.
-        launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        launchMotorR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        launchMotorR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //Makes the motors more precise with high speeds.
@@ -102,30 +102,32 @@ public class ArmController {
                 }
                 if (time >= outtakeTimer) {
                     dcIntakeSpeed = dcIntakeSpeedOn;
-                    advancementServoSpeed = advancementServoSpeedOff;
-                    shotSpeed = shotSpeedOff;
-                    //adjust ramp angle
-                    if (!hasUpdatedAdvancementTimer){
+                    advancementServoSpeed = advancementServoSpeedOuttake;
+                    shotSpeed = farShotSpeed;
+                    if (!hasUpdatedSpinupTimer) {
                         updateAdvancementTimer(time);
-                        hasUpdatedAdvancementTimer = true;
+                        hasUpdatedSpinupTimer = true;
                     }
-
-                    if (shotSpeedState == ShotSpeedState.close || shotSpeedState == ShotSpeedState.undefined) {
-
-                        if (!hasUpdatedAdjusterTimer) {
-                            updateAdjusterTimer(time);
-                            hasUpdatedAdjusterTimer = true;
+                    if (time >= advancementTimer) {
+                        //adjust
+                        if (shotSpeedState == ShotSpeedState.close || shotSpeedState == ShotSpeedState.undefined) {
+                            if (!hasUpdatedAdjusterTimer) {
+                                updateAdjusterTimer(time);
+                                hasUpdatedAdjusterTimer = true;
+                            }
+                            if (time >= adjusterTimer) {
+                                dcIntakeSpeed = dcIntakeSpeedOn;
+                                advancementServoSpeed = advancementServoSpeedOn;
+                                shotSpeed = farShotSpeed;
+                                shotSpeedState = ShotSpeedState.far;
+                            }
                         }
-                        if (time >= adjusterTimer) {
+                        else {
+                            dcIntakeSpeed = dcIntakeSpeedOn;
                             advancementServoSpeed = advancementServoSpeedOn;
-                            shotSpeed = farShotSpeed;
+                            shotSpeed = closeShotSpeed;
                             shotSpeedState = ShotSpeedState.far;
                         }
-                    }
-                    else {
-                        advancementServoSpeed = advancementServoSpeedOn;
-                        shotSpeed = farShotSpeed;
-                        shotSpeedState = ShotSpeedState.far;
                     }
                 }
                 break;
@@ -141,9 +143,9 @@ public class ArmController {
                     dcIntakeSpeed = dcIntakeSpeedOn;
                     advancementServoSpeed = advancementServoSpeedOuttake;
                     shotSpeed = closeShotSpeed;
-                    if (!hasUpdatedAdvancementTimer) {
+                    if (!hasUpdatedSpinupTimer) {
                         updateAdvancementTimer(time);
-                        hasUpdatedAdvancementTimer = true;
+                        hasUpdatedSpinupTimer = true;
                     }
                     if (time >= advancementTimer) {
                         //adjust
@@ -205,7 +207,7 @@ public class ArmController {
     void updateOuttakeTimer(long time){
         outtakeTimer = time + outtakeWaitTime;}
     void updateAdvancementTimer(long time){
-        advancementTimer = time + advancementWaitTime;}
+        advancementTimer = time + spinupWaitTime;}
 
 
 }

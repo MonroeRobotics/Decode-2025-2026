@@ -8,7 +8,6 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.ArmController;
 import org.slf4j.Logger;
@@ -73,7 +72,7 @@ public class drive extends OpMode {
         if (gamepad1.right_bumper && !previousGamepad.right_bumper){
             armController.hasUpdatedOuttakeTimer = false;
             armController.hasUpdatedAdjusterTimer = false;
-            armController.hasUpdatedAdvancementTimer = false;
+            armController.hasUpdatedSpinupTimer = false;
             if (!closeShotOn) {
                 armController.currentArmState = ArmController.armState.closeShot;
                 closeShotOn = true;
@@ -95,7 +94,7 @@ public class drive extends OpMode {
                 farShotOn = false;
             }
         }
-        if (gamepad1.left_bumper && !previousGamepad.left_bumper) {
+        if ((gamepad1.left_trigger > 0.2) && !(previousGamepad.left_trigger > 0.2)){
             if (!outtakeOn) {
                 armController.currentArmState = ArmController.armState.outtake;
                 outtakeOn = true;
@@ -105,14 +104,14 @@ public class drive extends OpMode {
                 outtakeOn = false;
             }
         }
-        if ((gamepad1.left_trigger > 0.2) && !(previousGamepad.left_trigger > 0.2)){
-            if (!closeShotOn) {
+        if (gamepad1.left_bumper && !previousGamepad.left_bumper){
+            if (!intakeOn) {
                 armController.currentArmState = ArmController.armState.intake;
-                closeShotOn = true;
+                intakeOn = true;
             }
             else{
                 armController.currentArmState = ArmController.armState.rest;
-                closeShotOn = false;
+                intakeOn = false;
             }
         }
 
