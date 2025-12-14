@@ -46,12 +46,15 @@ public class ArmController {
     long adjusterTimer;
     long advancementTimer;
     long outtakeTimer;
+    long brakeTimer;
     long adjustWaitTime = 500; //time in milliseconds
     public long outtakeWaitTime = 900;
     long spinupWaitTime = 650;
+    long brakeWaitTime = 100;
     public boolean hasUpdatedAdjusterTimer = false;
     public boolean hasUpdatedSpinupTimer = false;
     public boolean hasUpdatedOuttakeTimer = false;
+    public boolean hasUpdatedBrakeTimer = false;
 
 
     public enum armState{
@@ -71,8 +74,8 @@ public class ArmController {
         advancementServo = hardwareMap.get(CRServo.class, "advancementServo");
 
         //Making all motors brake when not powered.
-        launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        launchMotorR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        launchMotorR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //Makes the motors more precise with high speeds.
@@ -171,6 +174,16 @@ public class ArmController {
                 }
                 break;
             case intake:
+                if (!hasUpdatedBrakeTimer){
+                    launchMotorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    launchMotorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    brakeTimer += time + brakeWaitTime;
+                    hasUpdatedBrakeTimer = true;
+                }
+                if (time >= brakeTimer){
+                    launchMotorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                    launchMotorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                }
                 shotSpeed = shotSpeedOff;
                 advancementServoSpeed = advancementServoSpeedOn;
                 dcIntakeSpeed = dcIntakeSpeedOn;

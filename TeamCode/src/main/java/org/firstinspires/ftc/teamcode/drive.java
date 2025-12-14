@@ -105,6 +105,7 @@ public class drive extends OpMode {
             }
         }
         if (gamepad1.left_bumper && !previousGamepad.left_bumper){
+            armController.hasUpdatedBrakeTimer = false;
             if (!intakeOn) {
                 armController.currentArmState = ArmController.armState.intake;
                 intakeOn = true;
