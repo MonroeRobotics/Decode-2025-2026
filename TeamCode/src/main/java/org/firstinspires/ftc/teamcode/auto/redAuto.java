@@ -82,7 +82,7 @@ public class redAuto extends LinearOpMode{
 
         armController = new ArmController(hardwareMap);
 
-        armController.outtakeWaitTime = 1100;
+        armController.outtakeWaitTime = 1400;
 
         armController.initArm();
 
@@ -104,6 +104,7 @@ public class redAuto extends LinearOpMode{
                     armController.updateArmState(System.currentTimeMillis());
                     shotTimerStarted = false;
                     toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(123))
                             .strafeToLinearHeading(redCloseShot, Math.toRadians(123));
                     Actions.runBlocking(toShot.build());
                     autoState = AutoState.SHOT;
