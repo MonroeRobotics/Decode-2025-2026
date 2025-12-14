@@ -36,7 +36,7 @@ public class redAuto extends LinearOpMode{
     Vector2d redCloseShotAdvance  = new Vector2d(-60, 56); //123
 
     Vector2d redCloseShotTransition = new Vector2d(-14, 18); //123
-    
+
     Vector2d redHumanPlayer = new Vector2d(56, 54); //0
     Vector2d redStop = new Vector2d(-11, 52); //90
     Vector2d redPickupLineup1 = new Vector2d(35.5, 32); //90
@@ -72,7 +72,7 @@ public class redAuto extends LinearOpMode{
     TrajectoryActionBuilder toShot;
     TrajectoryActionBuilder toShotAdvance;
     TrajectoryActionBuilder toShotLeave;
-    
+
     TrajectoryActionBuilder toStop;
 
 

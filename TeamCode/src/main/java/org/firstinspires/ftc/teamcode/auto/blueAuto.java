@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ArmController;
 
 @Config
-@Autonomous(name = "red auto", group = "Autonomous")
+@Autonomous(name = "blue auto", group = "Autonomous")
 public class blueAuto extends LinearOpMode{
     ArmController armController;
     Gamepad previousGamepad;
@@ -26,17 +26,16 @@ public class blueAuto extends LinearOpMode{
     MecanumDrive mecanumDrive;
 
     Pose2d blueStart = new Pose2d(60,-12, Math.toRadians(180)); //90
-    Vector2d blueCloseShot = new Vector2d(-40,-40); //203
-    Vector2d blueCloseShotAdvance  = new Vector2d(-40, -45); //123
-    Vector2d blueCloseShotTransition = new Vector2d(14, -18); //123
-    Vector2d blueStop = new Vector2d(11, 52); //90
+    Vector2d blueCloseShot = new Vector2d(-40,-44); //203
+    Vector2d blueCloseShotAdvance  = new Vector2d(-40, -49); //123
+    Vector2d blueCloseShotTransition = new Vector2d(-15, -20); //123
+    Vector2d blueStop = new Vector2d(-20, -50); //90
     Vector2d bluePickupLineup1 = new Vector2d(35.5, -32); //90
     Vector2d bluePickupLineup2 = new Vector2d(11.5, -32); //90
     Vector2d bluePickupLineup3 = new Vector2d(-12, -32); //90
     Vector2d bluePickup1 = new Vector2d(35.5, -50); //90
     Vector2d bluePickup2 = new Vector2d(11.5, -50); //90
     Vector2d bluePickup3 = new Vector2d(-12, -50); //90
-
 
     enum AutoState{
         PICKUP,
@@ -50,7 +49,6 @@ public class blueAuto extends LinearOpMode{
 
     }
     AutoState autoState = AutoState.SHOT_APPROACH;
-
     double cycleNumber = 1;
     long shotWaitTimer;
     long advanceWaitTimer;
@@ -76,7 +74,7 @@ public class blueAuto extends LinearOpMode{
 
         armController = new ArmController(hardwareMap);
 
-        armController.outtakeWaitTime = 1100;
+        armController.outtakeWaitTime = 1300;
 
         armController.initArm();
 
@@ -122,7 +120,7 @@ public class blueAuto extends LinearOpMode{
                     break;
                 case SHOT_ADVANCE_SHOT:
                     if (!shotAdvanceTimerStarted){
-                        advanceWaitTimer = System.currentTimeMillis() + 4000;
+                        advanceWaitTimer = System.currentTimeMillis() + 2500;
                         shotAdvanceTimerStarted = true;
                     }
                     if (System.currentTimeMillis() >= advanceWaitTimer){
@@ -134,54 +132,22 @@ public class blueAuto extends LinearOpMode{
                 case SHOT_LEAVE:
                     if (cycleNumber < 0){ //change to 3 if doing full auto
                         toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(123));
+                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(-90));
                         Actions.runBlocking(toShotLeave.build());
                         cycleNumber += 1;
                         shotTimerStarted = false;
                         shotAdvanceTimerStarted = false;
                         armController.hasUpdatedOuttakeTimer = false;
                         armController.hasUpdatedAdjusterTimer = false;
-                        armController.hasUpdatedSpinupTimer = false;
                         autoState = AutoState.PICKUP;
                     }
                     else{
                         autoState = AutoState.STOP;
                     }
                     break;
-                case PICKUP:
-                    armController.currentArmState = ArmController.armState.intake;
-                    armController.updateArmState(System.currentTimeMillis());
-
-                    // Build the correct trajectory depending on the cycle
-                    if (cycleNumber == 1) {
-                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(90))
-                                .strafeToLinearHeading(bluePickup2, Math.toRadians(90))
-                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(90))
-                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(123));
-                    }
-                    else if (cycleNumber == 2) {
-                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(bluePickupLineup3, Math.toRadians(90))
-                                .strafeToLinearHeading(bluePickup3, Math.toRadians(90))
-                                .strafeToLinearHeading(bluePickupLineup3, Math.toRadians(90))
-                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(123));
-                    }
-                    else if (cycleNumber == 3) {
-                        toPickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(bluePickupLineup1, Math.toRadians(90))
-                                .strafeToLinearHeading(bluePickup1, Math.toRadians(90))
-                                .strafeToLinearHeading(bluePickupLineup1, Math.toRadians(90))
-                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(123));
-                    }
-
-                    // RUN the built trajectory
-                    Actions.runBlocking(toPickup1.build());
-                    autoState = AutoState.SHOT_APPROACH;
-                    break;
                 case STOP:
                     toStop = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(blueStop, Math.toRadians(90));
+                            .strafeToLinearHeading(blueStop, Math.toRadians(-90));
                     Actions.runBlocking(toStop.build());
                     if (!happyDanceTimerStarted){
                         shotWaitTimer = System.currentTimeMillis() + 3000;
