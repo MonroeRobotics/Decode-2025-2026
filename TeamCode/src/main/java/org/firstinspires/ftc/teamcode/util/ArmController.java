@@ -14,17 +14,17 @@ public class ArmController {
     }
     HardwareMap hardwareMap;
 
-    public final double closeShotSpeed = 0.42;
-    public final double farShotSpeed = 1; //placeholder
+    public final double closeShotSpeed = (0.42*100)*28;
+    public final double farShotSpeed = (100)*28; //placeholder
     public final double shotSpeedOff = 0;
-    public final double shotSpeedOuttake = -0.05;
+    public final double shotSpeedOuttake = (-0.05*100)*28;
     public double shotSpeed;
 
     public enum ShotSpeedState{close, far, undefined};
     ShotSpeedState shotSpeedState = ShotSpeedState.undefined;
 
-    public final double dcIntakeSpeedOn = 0.2;
-    public final double dcIntakeSpeedOuttake = -0.2;
+    public final double dcIntakeSpeedOn = (0.2*100)*28;
+    public final double dcIntakeSpeedOuttake = (-0.2*100)*28;
     public final double dcIntakeSpeedOff = 0;
 
     public final double advancementServoSpeedOn = 0.5;
@@ -201,9 +201,9 @@ public class ArmController {
 
         }
 
-        launchMotorL.setPower(shotSpeed);
-        launchMotorR.setPower(shotSpeed);
-        intakeMotor.setPower(dcIntakeSpeed);
+        launchMotorL.setVelocity(shotSpeed);
+        launchMotorR.setVelocity(shotSpeed);
+        intakeMotor.setVelocity(dcIntakeSpeed);
 
         advancementServo.setPower(advancementServoSpeed);
     }
