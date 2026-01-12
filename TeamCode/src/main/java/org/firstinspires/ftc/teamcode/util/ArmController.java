@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public class ArmController {
 
@@ -14,21 +16,23 @@ public class ArmController {
     }
     HardwareMap hardwareMap;
 
-    public final double closeShotSpeed = (0.42*100)*28;
-    public final double farShotSpeed = (100)*28; //placeholder
+    public final double closeShotSpeed = (0.4*100)*28;
     public final double shotSpeedOff = 0;
     public final double shotSpeedOuttake = (-0.05*100)*28;
     public double shotSpeed;
 
+    public double P;
+    public double F;
+
     public enum ShotSpeedState{close, far, undefined};
     ShotSpeedState shotSpeedState = ShotSpeedState.undefined;
 
-    public final double dcIntakeSpeedOn = (0.2*100)*28;
-    public final double dcIntakeSpeedOuttake = (-0.2*100)*28;
+    public final double dcIntakeSpeedOn = (0.5*100)*28;
+    public final double dcIntakeSpeedOuttake = (-0.5*100)*28;
     public final double dcIntakeSpeedOff = 0;
 
-    public final double advancementServoSpeedOn = 0.5;
-    public final double advancementServoSpeedOuttake = -0.5;
+    public final double advancementServoSpeedOn = 1;
+    public final double advancementServoSpeedOuttake = -1;
     public final double advancementServoSpeedOff = 0;
 
     public double dcIntakeSpeed;
@@ -38,22 +42,14 @@ public class ArmController {
 
 
     DcMotorEx intakeMotor;
-    DcMotorEx launchMotorL;
-    DcMotorEx launchMotorR;
+    DcMotorEx launchMotor;
 
     CRServo advancementServo;
-
-    long adjusterTimer;
-    long advancementTimer;
-    long outtakeTimer;
     long brakeTimer;
-    long adjustWaitTime = 500; //time in milliseconds
-    public long outtakeWaitTime = 900;
+    long spinupTimer;
     long spinupWaitTime = 650;
     long brakeWaitTime = 100;
-    public boolean hasUpdatedAdjusterTimer = false;
     public boolean hasUpdatedSpinupTimer = false;
-    public boolean hasUpdatedOuttakeTimer = false;
     public boolean hasUpdatedBrakeTimer = false;
 
 
@@ -67,24 +63,21 @@ public class ArmController {
     }
     public armState currentArmState = armState.rest;
     public void initArm(){
+        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0, 0, F);
         //Assigning each object to its correct port.
-        launchMotorL = hardwareMap.get(DcMotorEx.class, "launchMotorL");
-        launchMotorR = hardwareMap.get(DcMotorEx.class, "launchMotorR");
+        launchMotor = hardwareMap.get(DcMotorEx.class, "launchMotor");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         advancementServo = hardwareMap.get(CRServo.class, "advancementServo");
 
         //Making all motors brake when not powered.
-        launchMotorL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        launchMotorR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        launchMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //Makes the motors more precise with high speeds.
-        launchMotorL.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        launchMotorR.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        launchMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //Correcting the spin direction of launch motor.
-        launchMotorL.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         advancementServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -95,114 +88,33 @@ public class ArmController {
                 advancementServoSpeed = advancementServoSpeedOff;
                 shotSpeed = shotSpeedOff;
                 break;
-            case farShot: //todo add all the changes I did to close shot
-                dcIntakeSpeed = dcIntakeSpeedOuttake;
-                advancementServoSpeed = advancementServoSpeedOuttake;
-                shotSpeed = shotSpeedOuttake;
-                if (!hasUpdatedOuttakeTimer) {
-                    updateOuttakeTimer(time);
-                    hasUpdatedOuttakeTimer = true;
-                }
-                if (time >= outtakeTimer) {
-                    dcIntakeSpeed = dcIntakeSpeedOn;
-                    advancementServoSpeed = advancementServoSpeedOuttake;
-                    shotSpeed = farShotSpeed;
-                    if (!hasUpdatedSpinupTimer) {
-                        updateAdvancementTimer(time);
-                        hasUpdatedSpinupTimer = true;
-                    }
-                    if (time >= advancementTimer) {
-                        //adjust
-                        if (shotSpeedState == ShotSpeedState.close || shotSpeedState == ShotSpeedState.undefined) {
-                            if (!hasUpdatedAdjusterTimer) {
-                                updateAdjusterTimer(time);
-                                hasUpdatedAdjusterTimer = true;
-                            }
-                            if (time >= adjusterTimer) {
-                                dcIntakeSpeed = dcIntakeSpeedOn;
-                                advancementServoSpeed = advancementServoSpeedOn;
-                                shotSpeed = farShotSpeed;
-                                shotSpeedState = ShotSpeedState.far;
-                            }
-                        }
-                        else {
-                            dcIntakeSpeed = dcIntakeSpeedOn;
-                            advancementServoSpeed = advancementServoSpeedOn;
-                            shotSpeed = closeShotSpeed;
-                            shotSpeedState = ShotSpeedState.far;
-                        }
-                    }
-                }
-                break;
             case closeShot:
-                dcIntakeSpeed = dcIntakeSpeedOuttake;
-                advancementServoSpeed = advancementServoSpeedOuttake;
-                shotSpeed = shotSpeedOuttake;
-                if (!hasUpdatedOuttakeTimer) {
-                    updateOuttakeTimer(time);
-                    hasUpdatedOuttakeTimer = true;
-                }
-                if (time >= outtakeTimer) {
-                    dcIntakeSpeed = dcIntakeSpeedOn;
-                    advancementServoSpeed = advancementServoSpeedOuttake;
-                    shotSpeed = closeShotSpeed;
-                    if (!hasUpdatedSpinupTimer) {
-                        updateAdvancementTimer(time);
-                        hasUpdatedSpinupTimer = true;
-                    }
-                    if (time >= advancementTimer) {
-                        //adjust
-                        if (shotSpeedState == ShotSpeedState.far || shotSpeedState == ShotSpeedState.undefined) {
-                            if (!hasUpdatedAdjusterTimer) {
-                                updateAdjusterTimer(time);
-                                hasUpdatedAdjusterTimer = true;
-                            }
-                            if (time >= adjusterTimer) {
-                                dcIntakeSpeed = dcIntakeSpeedOn;
-                                advancementServoSpeed = advancementServoSpeedOn;
-                                shotSpeed = closeShotSpeed;
-                                shotSpeedState = ShotSpeedState.close;
-                            }
-                        }
-                        else {
-                            dcIntakeSpeed = dcIntakeSpeedOn;
-                            advancementServoSpeed = advancementServoSpeedOn;
-                            shotSpeed = closeShotSpeed;
-                            shotSpeedState = ShotSpeedState.close;
-                        }
-                    }
-                }
-                break;
+                dcIntakeSpeed = dcIntakeSpeedOn;
+                advancementServoSpeed = advancementServoSpeedOn;
+                shotSpeed = closeShotSpeed;
+                //todo - add spinup timer if nec
             case intake:
                 if (!hasUpdatedBrakeTimer){
-                    launchMotorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    launchMotorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                     brakeTimer += time + brakeWaitTime;
                     hasUpdatedBrakeTimer = true;
                 }
                 if (time >= brakeTimer){
-                    launchMotorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                    launchMotorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                    launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 }
                 shotSpeed = shotSpeedOff;
                 advancementServoSpeed = advancementServoSpeedOn;
                 dcIntakeSpeed = dcIntakeSpeedOn;
                 break;
-            case autoIntake:
-                shotSpeed = shotSpeedOff;
-                advancementServoSpeed = advancementServoSpeedOff;
-                dcIntakeSpeed = dcIntakeSpeedOn;
-                break;
             case outtake:
-                shotSpeed = shotSpeedOuttake;
+                shotSpeed = shotSpeedOff;
                 advancementServoSpeed = advancementServoSpeedOuttake;
                 dcIntakeSpeed = dcIntakeSpeedOuttake;
                 break;
 
         }
 
-        launchMotorL.setVelocity(shotSpeed);
-        launchMotorR.setVelocity(shotSpeed);
+        launchMotor.setVelocity(shotSpeed);
         intakeMotor.setVelocity(dcIntakeSpeed);
 
         advancementServo.setPower(advancementServoSpeed);
@@ -214,13 +126,6 @@ public class ArmController {
     public void setIntakeSpeed(double Intake_Speed){dcIntakeSpeed = Intake_Speed;}
 
     public void setShotSpeed(double Shot_Speed){shotSpeed = Shot_Speed;}
-
-    void updateAdjusterTimer(long time){
-        adjusterTimer = time + adjustWaitTime;}
-    void updateOuttakeTimer(long time){
-        outtakeTimer = time + outtakeWaitTime;}
-    void updateAdvancementTimer(long time){
-        advancementTimer = time + spinupWaitTime;}
 
 
 }

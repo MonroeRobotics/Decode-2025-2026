@@ -74,8 +74,6 @@ public class blueAuto extends LinearOpMode{
 
         armController = new ArmController(hardwareMap);
 
-        armController.outtakeWaitTime = 1300;
-
         armController.initArm();
 
         previousGamepad = new Gamepad();
@@ -136,9 +134,6 @@ public class blueAuto extends LinearOpMode{
                         Actions.runBlocking(toShotLeave.build());
                         cycleNumber += 1;
                         shotTimerStarted = false;
-                        shotAdvanceTimerStarted = false;
-                        armController.hasUpdatedOuttakeTimer = false;
-                        armController.hasUpdatedAdjusterTimer = false;
                         autoState = AutoState.PICKUP;
                     }
                     else{

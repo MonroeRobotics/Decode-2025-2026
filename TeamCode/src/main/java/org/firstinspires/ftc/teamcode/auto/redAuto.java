@@ -82,8 +82,6 @@ public class redAuto extends LinearOpMode{
 
         armController = new ArmController(hardwareMap);
 
-        armController.outtakeWaitTime = 1400;
-
         armController.initArm();
 
         previousGamepad = new Gamepad();
@@ -146,9 +144,6 @@ public class redAuto extends LinearOpMode{
                         cycleNumber += 1;
                         shotTimerStarted = false;
                         shotAdvanceTimerStarted = false;
-                        armController.hasUpdatedOuttakeTimer = false;
-                        armController.hasUpdatedAdjusterTimer = false;
-                        armController.hasUpdatedSpinupTimer = false;
                         autoState = AutoState.PICKUP;
                     }
                     else{

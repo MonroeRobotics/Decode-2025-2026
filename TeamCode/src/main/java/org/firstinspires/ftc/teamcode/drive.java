@@ -22,10 +22,9 @@ public class drive extends OpMode {
     double yPower;
     double headingPower;
 
-    double drivePowerReduction = 0.8;
+    double drivePowerReduction = 0.9;
     double turnPowerReduction = 0.75;
 
-    Gamepad currentGamepad;
     Gamepad previousGamepad;
 
     MecanumDrive mecanumDrive;
@@ -70,9 +69,6 @@ public class drive extends OpMode {
 
 
         if (gamepad1.right_bumper && !previousGamepad.right_bumper){
-            armController.hasUpdatedOuttakeTimer = false;
-            armController.hasUpdatedAdjusterTimer = false;
-            armController.hasUpdatedSpinupTimer = false;
             if (!closeShotOn) {
                 armController.currentArmState = ArmController.armState.closeShot;
                 closeShotOn = true;
@@ -83,8 +79,6 @@ public class drive extends OpMode {
             }
         }
         if ((gamepad1.right_trigger > 0.2) && !(previousGamepad.right_trigger > 0.2)){
-            armController.hasUpdatedOuttakeTimer = false;
-            armController.hasUpdatedAdjusterTimer = false;
             if (!farShotOn) {
                 armController.currentArmState = ArmController.armState.farShot;
                 farShotOn = true;
@@ -105,7 +99,6 @@ public class drive extends OpMode {
             }
         }
         if (gamepad1.left_bumper && !previousGamepad.left_bumper){
-            armController.hasUpdatedBrakeTimer = false;
             if (!intakeOn) {
                 armController.currentArmState = ArmController.armState.intake;
                 intakeOn = true;
@@ -131,7 +124,6 @@ public class drive extends OpMode {
         else {intakeState = "off";}
 
         if (armController.shotSpeed == 0.45) {shotSpeedState = "close";}
-        else if (armController.shotSpeed == armController.farShotSpeed) {shotSpeedState = "far";}
         else {shotSpeedState = "off";}
 
         telemetry.update();
