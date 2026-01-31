@@ -25,7 +25,7 @@ public class redAuto extends LinearOpMode{
 
     MecanumDrive mecanumDrive;
 
-    Pose2d redStart = new Pose2d(-54, 46, Math.toRadians(123)); //123
+    Pose2d redStart = new Pose2d(-60, 52, Math.toRadians(123)); //123
 
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
@@ -69,7 +69,7 @@ public class redAuto extends LinearOpMode{
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         armController = new ArmController(hardwareMap);
-
+        armController.setLaunchSpeed = 0.435;
         armController.initArm();
 
         previousGamepad = new Gamepad();
@@ -81,26 +81,62 @@ public class redAuto extends LinearOpMode{
         while (opModeIsActive()){
             switch (autoState){
                 case SHOT:
-                    armController.currentArmState = ArmController.armState.closeShot;
-                    if (!shotTimerStarted){
-                        shotWaitTimer += 7000; //7 seconds
+                    if (!shotTimerStarted) {
+                        shotWaitTimer = System.currentTimeMillis();
                         shotTimerStarted = true;
                     }
-                    if (shotWaitTimer >= System.currentTimeMillis()){
+
+                    long elapsed = System.currentTimeMillis() - shotWaitTimer;
+
+                    // 1. Initial Spin Up (0 to 5s)
+                    if (elapsed < 5000) {
+                        armController.currentArmState = ArmController.armState.spinupShot;
+                    }
+                    // 2. Fire First Volley (5.5s to 6.0s) -> 0.5s duration
+                    else if (elapsed < 5500) {
+                        armController.currentArmState = ArmController.armState.autoCloseShot;
+                    }
+                    // 3. First Pause (5.5s to 6.0s) -> 1.0s duration
+                    else if (elapsed < 6500) {
+                        armController.currentArmState = ArmController.armState.spinupShot;
+                    }
+                    // 4. Fire Second Volley (6.5s to 8s) -> 1.5s duration
+                    else if (elapsed < 8000) {
+                        armController.currentArmState = ArmController.armState.autoCloseShot;
+                    }
+                    // 5. NEW: Second Pause (8s to 9s) -> 1.0s duration
+                    else if (elapsed < 9000) {
+                        armController.currentArmState = ArmController.armState.spinupShot;
+                    }
+                    // 6. Fire Remaining (9s onwards)
+                    else {
+                        armController.currentArmState = ArmController.armState.autoCloseShot;
+                    }
+
+                    // Leave SHOT after 11 seconds total (increased slightly to accommodate gaps)
+                    if (elapsed >= 11000) {
+                        shotTimerStarted = false;
                         autoState = AutoState.SHOT_LEAVE;
                     }
                     break;
                 case SHOT_LEAVE:
                     shotTimerStarted = false;
                     armController.currentArmState = ArmController.armState.rest;
-                    toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+
+                    // 1. Build the trajectory
+                    TrajectoryActionBuilder leaveAction = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
                             .strafeToLinearHeading(redStop, Math.toRadians(90));
+
+                    // 2. RUN the trajectory (This is the missing step)
+                    Actions.runBlocking(leaveAction.build());
+
                     autoState = AutoState.STOP;
                     break;
                 case STOP:
                     break;
             }
             armController.updateArmState(System.currentTimeMillis());
+            telemetry.addData("shotLaunchSpeed", armController.setLaunchSpeed);
         }
     }
 }

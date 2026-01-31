@@ -65,13 +65,13 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick = 0.001970425741;
-        public double lateralInPerTick = 0.001509488595301291;
-        public double trackWidthTicks = 8857.414591871955;
+        public double inPerTick = 0.001972751489;
+        public double lateralInPerTick = 0.0013942048377128193;
+        public double trackWidthTicks = 6590.8874513756155;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.382789986856893;
-        public double kV =  0.00026559056257271553;
+        public double kS = 1.5727436078532802;
+        public double kV =  0.00020342566791560366;
         public double kA = 0.00005;
 
         // path profile parameters (in inches)
@@ -237,6 +237,8 @@ public final class MecanumDrive {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html

@@ -7,23 +7,36 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.util.ArmController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "drive", group = "main")
 public class drive extends OpMode {
     private static final Logger log = LoggerFactory.getLogger(drive.class);
     ArmController armController;
+    DcMotorEx launchL;
 
     double xPower;
     double yPower;
     double headingPower;
 
-    double drivePowerReduction = 0.9;
+    double drivePowerReduction = 0.85;
     double turnPowerReduction = 0.75;
+
+    boolean closeShotOn = false;
+    boolean sequenceActive = false;
+    boolean outtakePhaseActive = false;
+    boolean spinupPhaseActive = false;
+
+    ElapsedTime sequenceTimer = new ElapsedTime();
+
+
+    ElapsedTime spinupTimer = new ElapsedTime();
 
     Gamepad previousGamepad;
 
@@ -33,17 +46,18 @@ public class drive extends OpMode {
 
     boolean intakeOn = false;
     boolean outtakeOn = false;
-    boolean closeShotOn = false;
     boolean farShotOn = false;
 
     String intakeState;
     String shotSpeedState;
+
 
     @Override
     public void init() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         armController = new ArmController(hardwareMap);
+        armController.setLaunchSpeed = 0.413;
         armController.initArm();
 
         previousGamepad = new Gamepad();
@@ -68,19 +82,53 @@ public class drive extends OpMode {
         headingPower *= drivePowerReduction;
 
 
-        if (gamepad1.right_bumper && !previousGamepad.right_bumper){
-            if (!closeShotOn) {
-                armController.currentArmState = ArmController.armState.closeShot;
+        if (gamepad1.right_bumper && !previousGamepad.right_bumper) {
+
+            if (!sequenceActive) {
+                // Start full sequence
+                armController.currentArmState = ArmController.armState.closeShotOuttake;
+                sequenceTimer.reset();
+
+                sequenceActive = true;
+                outtakePhaseActive = true;
+                spinupPhaseActive = false;
                 closeShotOn = true;
             }
             else {
+                // Cancel everything
                 armController.currentArmState = ArmController.armState.rest;
+
+                sequenceActive = false;
+                outtakePhaseActive = false;
+                spinupPhaseActive = false;
                 closeShotOn = false;
             }
         }
+
+        if (sequenceActive) {
+
+            // Phase 1 → Phase 2 (after 0.75 s)
+            if (outtakePhaseActive && sequenceTimer.seconds() >= 0.75) {
+                armController.currentArmState = ArmController.armState.spinupShot;
+                sequenceTimer.reset();
+
+                outtakePhaseActive = false;
+                spinupPhaseActive = true;
+            }
+
+            // Phase 2 → Phase 3 (after 1.75 s)
+            else if (spinupPhaseActive && sequenceTimer.seconds() >= 2.5) {
+                armController.currentArmState = ArmController.armState.closeShot;
+
+                spinupPhaseActive = false;
+                // sequenceActive stays true until canceled
+            }
+        }
+
+
         if ((gamepad1.right_trigger > 0.2) && !(previousGamepad.right_trigger > 0.2)){
             if (!farShotOn) {
-                armController.currentArmState = ArmController.armState.farShot;
+                armController.currentArmState = ArmController.armState.closeShot;
                 farShotOn = true;
             }
             else{
@@ -108,6 +156,12 @@ public class drive extends OpMode {
                 intakeOn = false;
             }
         }
+        if (gamepad1.dpadUpWasPressed()){
+            armController.setLaunchSpeed += 0.01;
+        }
+        if (gamepad1.dpadDownWasPressed()){
+            armController.setLaunchSpeed -= 0.01;
+        }
 
         Vector2d gamepadInput = new Vector2d(xPower, yPower);
         PoseVelocity2d mecanumMotorPowers = new PoseVelocity2d(gamepadInput, headingPower);
@@ -119,13 +173,6 @@ public class drive extends OpMode {
         previousGamepad.copy(gamepad1);
 
 
-        if (armController.advancementServoSpeed > 0) {intakeState = "intake";}
-        else if (armController.advancementServoSpeed < 0){intakeState = "outtake";}
-        else {intakeState = "off";}
-
-        if (armController.shotSpeed == 0.45) {shotSpeedState = "close";}
-        else {shotSpeedState = "off";}
-
         telemetry.update();
 
         telemetry.addData("X power", xPower);
@@ -134,9 +181,10 @@ public class drive extends OpMode {
         telemetry.addData("gamepad Y", gamepad1.left_stick_y);
         telemetry.addData("Heading power", headingPower);
         telemetry.addData("Arm state", armController.currentArmState);
-        telemetry.addData("Launch Speed", armController.shotSpeed);
         telemetry.addData("left trigger", gamepad1.left_trigger);
-        telemetry.addData("Dc intake Speed", armController.dcIntakeSpeed);
+        telemetry.addData("Dc intake Speed", armController.dcIntakeSpeedOn);
+        telemetry.addData("Actual State", armController.currentArmState);
+        telemetry.addData("shotLaunchSpeed", armController.setLaunchSpeed);
     }
 
 

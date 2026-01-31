@@ -25,7 +25,7 @@ public class blueAuto extends LinearOpMode{
 
     MecanumDrive mecanumDrive;
 
-    Pose2d blueStart = new Pose2d(60,-12, Math.toRadians(180)); //90
+    Pose2d blueStart = new Pose2d(-40,-44, Math.toRadians(180)); //90
     Vector2d blueCloseShot = new Vector2d(-40,-44); //203
     Vector2d blueCloseShotAdvance  = new Vector2d(-40, -49); //123
     Vector2d blueCloseShotTransition = new Vector2d(-15, -20); //123
@@ -37,7 +37,7 @@ public class blueAuto extends LinearOpMode{
     Vector2d bluePickup2 = new Vector2d(11.5, -50); //90
     Vector2d bluePickup3 = new Vector2d(-12, -50); //90
 
-    enum AutoState{
+    enum AutoState {
         PICKUP,
         SHOT_APPROACH,
         SHOT,
@@ -48,21 +48,13 @@ public class blueAuto extends LinearOpMode{
         TRUE_STOP
 
     }
-    AutoState autoState = AutoState.SHOT_APPROACH;
-    double cycleNumber = 1;
-    long shotWaitTimer;
-    long advanceWaitTimer;
-    boolean shotTimerStarted = false;
-    boolean shotAdvanceTimerStarted = false;
-    boolean happyDanceTimerStarted = false;
+    AutoState autoState = blueAuto.AutoState.SHOT;
 
-    TrajectoryActionBuilder toPickup1;
-    TrajectoryActionBuilder toPickup2;
-    TrajectoryActionBuilder toPickup3;
-    TrajectoryActionBuilder toTurn;
+    long shotWaitTimer;
+    boolean shotTimerStarted = false;
+
 
     TrajectoryActionBuilder toShot;
-    TrajectoryActionBuilder toShotAdvance;
     TrajectoryActionBuilder toShotLeave;
 
     TrajectoryActionBuilder toStop;
@@ -73,7 +65,7 @@ public class blueAuto extends LinearOpMode{
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         armController = new ArmController(hardwareMap);
-
+        armController.setLaunchSpeed = 0.43;
         armController.initArm();
 
         previousGamepad = new Gamepad();
@@ -84,78 +76,63 @@ public class blueAuto extends LinearOpMode{
 
         while (opModeIsActive()){
             switch (autoState){
-                case SHOT_APPROACH:
-                    if (cycleNumber == 1){
-                        armController.currentArmState = ArmController.armState.autoIntake;
-                    }
-                    else{
-                        armController.currentArmState = ArmController.armState.intake;
-                    }
-                    armController.updateArmState(System.currentTimeMillis());
-                    shotTimerStarted = false;
-                    toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(blueCloseShot, Math.toRadians(-120));
-                    Actions.runBlocking(toShot.build());
-                    autoState = AutoState.SHOT;
-                    break;
                 case SHOT:
-                    armController.currentArmState = ArmController.armState.closeShot;
-                    armController.updateArmState(System.currentTimeMillis());
-
-                    if (!shotTimerStarted){
-                        shotWaitTimer = System.currentTimeMillis() + 4000; //2 seconds
+                    if (!shotTimerStarted) {
+                        shotWaitTimer = System.currentTimeMillis();
                         shotTimerStarted = true;
                     }
-                    if (System.currentTimeMillis() >= shotWaitTimer){
-                        autoState = AutoState.SHOT_ADVANCE;
+
+                    long elapsed = System.currentTimeMillis() - shotWaitTimer;
+
+                    // 1. Initial Spin Up (0 to 5s)
+                    if (elapsed < 5000) {
+                        armController.currentArmState = ArmController.armState.spinupShot;
                     }
-                    break;
-                case SHOT_ADVANCE:
-                    toShotAdvance = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(blueCloseShotAdvance, Math.toRadians(-123));
-                    Actions.runBlocking(toShotAdvance.build());
-                    autoState = AutoState.SHOT_ADVANCE_SHOT;
-                    break;
-                case SHOT_ADVANCE_SHOT:
-                    if (!shotAdvanceTimerStarted){
-                        advanceWaitTimer = System.currentTimeMillis() + 2500;
-                        shotAdvanceTimerStarted = true;
+                    // 2. Fire First Volley (5.5s to 6.0s) -> 0.5s duration
+                    else if (elapsed < 5500) {
+                        armController.currentArmState = ArmController.armState.autoCloseShot;
                     }
-                    if (System.currentTimeMillis() >= advanceWaitTimer){
-                        armController.currentArmState = ArmController.armState.rest;
-                        armController.updateArmState(System.currentTimeMillis());
-                        autoState = AutoState.SHOT_LEAVE;
+                    // 3. First Pause (5.5s to 6.0s) -> 1.0s duration
+                    else if (elapsed < 6500) {
+                        armController.currentArmState = ArmController.armState.spinupShot;
+                    }
+                    // 4. Fire Second Volley (6.5s to 8s) -> 1.5s duration
+                    else if (elapsed < 8000) {
+                        armController.currentArmState = ArmController.armState.autoCloseShot;
+                    }
+                    // 5. NEW: Second Pause (8s to 9s) -> 1.0s duration
+                    else if (elapsed < 9000) {
+                        armController.currentArmState = ArmController.armState.spinupShot;
+                    }
+                    // 6. Fire Remaining (9s onwards)
+                    else {
+                        armController.currentArmState = ArmController.armState.autoCloseShot;
+                    }
+
+                    // Leave SHOT after 11 seconds total (increased slightly to accommodate gaps)
+                    if (elapsed >= 11000) {
+                        shotTimerStarted = false;
+                        autoState = blueAuto.AutoState.SHOT_LEAVE;
                     }
                     break;
                 case SHOT_LEAVE:
-                    if (cycleNumber < 0){ //change to 3 if doing full auto
-                        toShotLeave = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(-90));
-                        Actions.runBlocking(toShotLeave.build());
-                        cycleNumber += 1;
-                        shotTimerStarted = false;
-                        autoState = AutoState.PICKUP;
-                    }
-                    else{
-                        autoState = AutoState.STOP;
-                    }
+                    shotTimerStarted = false;
+                    armController.currentArmState = ArmController.armState.rest;
+
+                    // 1. Build the trajectory
+                    TrajectoryActionBuilder leaveAction = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .strafeToLinearHeading(bluePickupLineup1, Math.toRadians(90));
+
+                    // 2. RUN the trajectory (This is the missing step)
+                    Actions.runBlocking(leaveAction.build());
+
+                    autoState = blueAuto.AutoState.STOP;
                     break;
                 case STOP:
-                    toStop = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(blueStop, Math.toRadians(-90));
-                    Actions.runBlocking(toStop.build());
-                    if (!happyDanceTimerStarted){
-                        shotWaitTimer = System.currentTimeMillis() + 3000;
-                        happyDanceTimerStarted = true;
-                    }
-                    if (System.currentTimeMillis() >= shotWaitTimer){
-                        autoState = AutoState.TRUE_STOP;
-                    }
-                    break;
-                case TRUE_STOP:
                     break;
             }
             armController.updateArmState(System.currentTimeMillis());
+            telemetry.addData("shotLaunchSpeed", armController.setLaunchSpeed);
         }
     }
 }
