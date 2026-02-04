@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.util.ArmController;
 
 @Config
 @Autonomous(name = "red auto", group = "Autonomous")
-public class redAuto extends LinearOpMode{
+public class redAutoClose extends LinearOpMode{
     ArmController armController;
     Gamepad previousGamepad;
 
@@ -56,6 +56,7 @@ public class redAuto extends LinearOpMode{
 
     long shotWaitTimer;
     boolean shotTimerStarted = false;
+    int cycleNum = 0;
 
 
     TrajectoryActionBuilder toShot;
@@ -122,14 +123,24 @@ public class redAuto extends LinearOpMode{
                 case SHOT_LEAVE:
                     shotTimerStarted = false;
                     armController.currentArmState = ArmController.armState.rest;
+                    if (cycleNum == 0){
+                        TrajectoryActionBuilder pickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickup2, Math.toRadians(90))
+                                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
+                                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(123));
+                        Actions.runBlocking(pickup1.build());
+                    }
 
-                    // 1. Build the trajectory
-                    TrajectoryActionBuilder leaveAction = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(redStop, Math.toRadians(90));
+                    else {
+                        // 1. Build the trajectory
+                        TrajectoryActionBuilder leaveAction = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                                .strafeToLinearHeading(redStop, Math.toRadians(90));
 
-                    // 2. RUN the trajectory (This is the missing step)
-                    Actions.runBlocking(leaveAction.build());
-
+                        // 2. RUN the trajectory (This is the missing step)
+                        Actions.runBlocking(leaveAction.build());
+                    }
                     autoState = AutoState.STOP;
                     break;
                 case STOP:
