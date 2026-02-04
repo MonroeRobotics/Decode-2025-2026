@@ -136,7 +136,6 @@ public class redAutoClose extends LinearOpMode{
                         cycleNum += 1;
                         autoState = AutoState.SHOT_APPROACH;
                     }
-
                     else {
                         // 1. Build the trajectory
                         TrajectoryActionBuilder leaveAction = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
