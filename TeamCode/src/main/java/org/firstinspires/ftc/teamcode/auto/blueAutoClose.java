@@ -77,6 +77,7 @@ public class blueAutoClose extends LinearOpMode{
                             .strafeToLinearHeading(blueCloseShot, Math.toRadians(203));
                     Actions.runBlocking(toShot.build());
                     autoState = AutoState.SHOT;
+                    break;
                 case SHOT:
                     if (!shotTimerStarted) {
                         shotWaitTimer = System.currentTimeMillis();

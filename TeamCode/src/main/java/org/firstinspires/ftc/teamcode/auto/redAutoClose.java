@@ -82,6 +82,7 @@ public class redAutoClose extends LinearOpMode{
                             .strafeToLinearHeading(redCloseShot, Math.toRadians(123));
                     Actions.runBlocking(toShot.build());
                     autoState = AutoState.SHOT;
+                    break;
                 case SHOT:
                     if (!shotTimerStarted) {
                         shotWaitTimer = System.currentTimeMillis();
