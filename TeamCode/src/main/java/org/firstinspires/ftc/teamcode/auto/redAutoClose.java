@@ -59,10 +59,6 @@ public class redAutoClose extends LinearOpMode{
     int cycleNum = 0;
 
 
-    TrajectoryActionBuilder toShot;
-    TrajectoryActionBuilder toShotLeave;
-
-    TrajectoryActionBuilder toStop;
 
 
     @Override
@@ -81,6 +77,11 @@ public class redAutoClose extends LinearOpMode{
 
         while (opModeIsActive()){
             switch (autoState){
+                case SHOT_APPROACH:
+                    TrajectoryActionBuilder toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                            .strafeToLinearHeading(redCloseShot, Math.toRadians(123));
+                    Actions.runBlocking(toShot.build());
+                    autoState = AutoState.SHOT;
                 case SHOT:
                     if (!shotTimerStarted) {
                         shotWaitTimer = System.currentTimeMillis();
@@ -131,6 +132,8 @@ public class redAutoClose extends LinearOpMode{
                                 .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
                                 .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(123));
                         Actions.runBlocking(pickup1.build());
+                        cycleNum += 1;
+                        autoState = AutoState.SHOT_APPROACH;
                     }
 
                     else {
@@ -140,8 +143,8 @@ public class redAutoClose extends LinearOpMode{
 
                         // 2. RUN the trajectory (This is the missing step)
                         Actions.runBlocking(leaveAction.build());
+                        autoState = AutoState.STOP;
                     }
-                    autoState = AutoState.STOP;
                     break;
                 case STOP:
                     break;
