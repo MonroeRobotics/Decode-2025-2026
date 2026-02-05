@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 // RR-specific imports
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
-
-// Non-RR imports
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,29 +17,25 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ArmController;
 
 @Config
-@Autonomous(name = "Red Auto Close", group = "Autonomous")
-public class redAutoClose extends LinearOpMode{
+@Autonomous(name = "Blue Auto Far", group = "Autonomous")
+public class blueAutoFar extends LinearOpMode{
     ArmController armController;
     Gamepad previousGamepad;
 
     MecanumDrive mecanumDrive;
 
-    Pose2d redStart = new Pose2d(-60, 52, Math.toRadians(123)); //123
+    Pose2d blueStart = new Pose2d(59,12, Math.toRadians(90)); //90
+    Vector2d blueCloseShot = new Vector2d(-40,-44); //203
+    Vector2d blueCloseShotAdvance  = new Vector2d(-40, -49); //123
+    Vector2d blueCloseShotTransition = new Vector2d(-20, -20); //123
+    Vector2d blueStop = new Vector2d(35.5, -32); //90
+    Vector2d bluePickupLineup1 = new Vector2d(35.5, -32); //90
+    Vector2d bluePickupLineup2 = new Vector2d(11.5, -32); //90
+    Vector2d bluePickupLineup3 = new Vector2d(-12, -32); //90
+    Vector2d bluePickup1 = new Vector2d(35.5, -50); //90
+    Vector2d bluePickup2 = new Vector2d(11.5, -50); //90
+    Vector2d bluePickup3 = new Vector2d(-12, -50); //90
 
-
-    Vector2d redFarShot = new Vector2d(56, 12); //157
-    Vector2d redCloseShot  = new Vector2d(-60, 52); //123
-    Vector2d redCloseShotAdvance  = new Vector2d(-60, 56); //123
-
-    Vector2d redCloseShotTransition = new Vector2d(-14, 18); //123
-
-    Vector2d redStop = new Vector2d(-18, 47); //90
-    Vector2d redPickupLineup1 = new Vector2d(35.5, 32); //90
-    Vector2d redPickupLineup2 = new Vector2d(11.5, 32); //90
-    Vector2d redPickupLineup3 = new Vector2d(-12, 32); //90
-    Vector2d redPickup1 = new Vector2d(35.5, 50); //90
-    Vector2d redPickup2 = new Vector2d(11.5, 50); //90
-    Vector2d redPickup3 = new Vector2d(-12, 50); //90
     enum AutoState {
         PICKUP,
         SHOT_APPROACH,
@@ -52,13 +47,12 @@ public class redAutoClose extends LinearOpMode{
         TRUE_STOP
 
     }
-    AutoState autoState = AutoState.SHOT;
+    AutoState autoState = AutoState.SHOT_APPROACH;
 
     long shotWaitTimer;
     boolean shotTimerStarted = false;
+
     int cycleNum = 0;
-
-
 
 
     @Override
@@ -66,21 +60,21 @@ public class redAutoClose extends LinearOpMode{
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         armController = new ArmController(hardwareMap);
-        armController.setLaunchSpeed = 0.435;
+        armController.setLaunchSpeed = 0.43;
         armController.initArm();
 
         previousGamepad = new Gamepad();
 
         while (opModeInInit()){
-            mecanumDrive = new MecanumDrive(hardwareMap, redStart);
+            mecanumDrive = new MecanumDrive(hardwareMap, blueStart);
         }
 
         while (opModeIsActive()){
             switch (autoState){
                 case SHOT_APPROACH:
                     TrajectoryActionBuilder toShot = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                            .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(123))
-                            .strafeToLinearHeading(redCloseShot, Math.toRadians(123));
+                            .strafeToLinearHeading(blueCloseShotTransition,Math.toRadians(203))
+                            .strafeToLinearHeading(blueCloseShot, Math.toRadians(203));
                     Actions.runBlocking(toShot.build());
                     autoState = AutoState.SHOT;
                     break;
@@ -120,32 +114,32 @@ public class redAutoClose extends LinearOpMode{
                     // Leave SHOT after 11 seconds total (increased slightly to accommodate gaps)
                     if (elapsed >= 11000) {
                         shotTimerStarted = false;
-                        autoState = AutoState.SHOT_LEAVE;
+                        autoState = blueAutoFar.AutoState.SHOT_LEAVE;
                     }
                     break;
                 case SHOT_LEAVE:
                     shotTimerStarted = false;
                     armController.currentArmState = ArmController.armState.rest;
                     if (cycleNum == 0){
-                        TrajectoryActionBuilder pickup1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(90))
-                                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
-                                .strafeToLinearHeading(redPickup2, Math.toRadians(90))
-                                .strafeToLinearHeading(redPickupLineup2, Math.toRadians(90))
-                                .strafeToLinearHeading(redCloseShotTransition, Math.toRadians(123));
-                        Actions.runBlocking(pickup1.build());
+                        TrajectoryActionBuilder pickUp1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
+                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(180))
+                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(180))
+                                .strafeToLinearHeading(bluePickup2, Math.toRadians(180))
+                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(180))
+                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(203));
+                        Actions.runBlocking(pickUp1.build());
                         cycleNum += 1;
                         autoState = AutoState.SHOT_APPROACH;
                     }
-                    else {
-                        // 1. Build the trajectory
+                    else{
                         TrajectoryActionBuilder leaveAction = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(redStop, Math.toRadians(90));
+                                .strafeToLinearHeading(blueStop, Math.toRadians(180));
 
                         // 2. RUN the trajectory (This is the missing step)
                         Actions.runBlocking(leaveAction.build());
-                        autoState = AutoState.STOP;
+                        autoState = blueAutoFar.AutoState.STOP;
                     }
+
                     break;
                 case STOP:
                     break;

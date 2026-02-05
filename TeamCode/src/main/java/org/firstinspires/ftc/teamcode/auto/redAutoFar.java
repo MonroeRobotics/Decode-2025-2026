@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 // RR-specific imports
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
-
-// Non-RR imports
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,8 +17,8 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ArmController;
 
 @Config
-@Autonomous(name = "Red Auto Close", group = "Autonomous")
-public class redAutoClose extends LinearOpMode{
+@Autonomous(name = "Red Auto Far", group = "Autonomous")
+public class redAutoFar extends LinearOpMode{
     ArmController armController;
     Gamepad previousGamepad;
 
@@ -52,7 +51,7 @@ public class redAutoClose extends LinearOpMode{
         TRUE_STOP
 
     }
-    AutoState autoState = AutoState.SHOT;
+    AutoState autoState = AutoState.SHOT_APPROACH;
 
     long shotWaitTimer;
     boolean shotTimerStarted = false;
