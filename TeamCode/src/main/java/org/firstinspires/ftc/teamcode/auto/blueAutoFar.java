@@ -24,7 +24,7 @@ public class blueAutoFar extends LinearOpMode{
 
     MecanumDrive mecanumDrive;
 
-    Pose2d blueStart = new Pose2d(59,12, Math.toRadians(90)); //90
+    Pose2d blueStart = new Pose2d(59,12, Math.toRadians(180)); //90
     Vector2d blueCloseShot = new Vector2d(-40,-44); //203
     Vector2d blueCloseShotAdvance  = new Vector2d(-40, -49); //123
     Vector2d blueCloseShotTransition = new Vector2d(-20, -20); //123
@@ -122,10 +122,10 @@ public class blueAutoFar extends LinearOpMode{
                     armController.currentArmState = ArmController.armState.rest;
                     if (cycleNum == 0){
                         TrajectoryActionBuilder pickUp1 = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(180))
-                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(180))
-                                .strafeToLinearHeading(bluePickup2, Math.toRadians(180))
-                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(180))
+                                .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(270))
+                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(270))
+                                .strafeToLinearHeading(bluePickup2, Math.toRadians(270))
+                                .strafeToLinearHeading(bluePickupLineup2, Math.toRadians(270))
                                 .strafeToLinearHeading(blueCloseShotTransition, Math.toRadians(203));
                         Actions.runBlocking(pickUp1.build());
                         cycleNum += 1;
@@ -133,7 +133,7 @@ public class blueAutoFar extends LinearOpMode{
                     }
                     else{
                         TrajectoryActionBuilder leaveAction = mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                .strafeToLinearHeading(blueStop, Math.toRadians(180));
+                                .strafeToLinearHeading(blueStop, Math.toRadians(270));
 
                         // 2. RUN the trajectory (This is the missing step)
                         Actions.runBlocking(leaveAction.build());

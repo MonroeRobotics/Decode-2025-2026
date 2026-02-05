@@ -24,7 +24,7 @@ public class redAutoFar extends LinearOpMode{
 
     MecanumDrive mecanumDrive;
 
-    Pose2d redStart = new Pose2d(-60, 52, Math.toRadians(123)); //123
+    Pose2d redStart = new Pose2d(59, -12, Math.toRadians(180)); //123
 
 
     Vector2d redFarShot = new Vector2d(56, 12); //157
