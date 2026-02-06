@@ -152,6 +152,8 @@ public class redAutoClose extends LinearOpMode{
             }
             armController.updateArmState(System.currentTimeMillis());
             telemetry.addData("shotLaunchSpeed", armController.setLaunchSpeed);
+            telemetry.addData("position", mecanumDrive.localizer.getPose());
+            telemetry.addData("auto state", autoState);
         }
     }
 }
