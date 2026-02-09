@@ -1,36 +1,38 @@
 package org.firstinspires.ftc.teamcode.auto;
+// RR-specific imports
 
-// RR imports
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-
-// FTC imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
-// Team imports
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ArmController;
 
-@Autonomous(name = "red auto champs", group = "Autonomous")
-public class redAutoClose extends LinearOpMode {
-
+@Config
+@Autonomous(name = "blue auto Old", group = "Autonomous")
+public class blueAutoOld extends LinearOpMode{
     ArmController armController;
+    Gamepad previousGamepad;
+
     MecanumDrive mecanumDrive;
 
-    // ---------------- POSES ----------------
-    Pose2d redStart = new Pose2d(-60, 52, Math.toRadians(123));
-    Vector2d redCloseShot = new Vector2d(-60, 52);
-    Vector2d redLeave = new Vector2d(-20,45);
-    Vector2d redCloseShotTransition = new Vector2d(-40, 35);
-
-    Vector2d redPickupLineup2 = new Vector2d(-3, 35);
-    Vector2d redPickup2 = new Vector2d(-3, 62);
-
+    Pose2d blueStart = new Pose2d(-60,-52, Math.toRadians(203)); //90
+    Vector2d blueCloseShot = new Vector2d(-60,-52); //203
+    Vector2d blueCloseShotAdvance  = new Vector2d(-40, -49); //123
+    Vector2d blueCloseShotTransition = new Vector2d(-40, -35); //123
+    Vector2d blueStop = new Vector2d(35.5, -32); //90
+    Vector2d bluePickupLineup1 = new Vector2d(21, -35); //90
+    Vector2d bluePickupLineup2 = new Vector2d(11.5, -32); //90
+    Vector2d bluePickupLineup3 = new Vector2d(-12, -32); //90
+    Vector2d bluePickup1 = new Vector2d(21, -62); //90
+    Vector2d bluePickup2 = new Vector2d(11.5, -50); //90
+    Vector2d bluePickup3 = new Vector2d(-12, -50); //90
     // ---------------- STATES ----------------
     enum AutoState {
         SHOT,
@@ -53,10 +55,10 @@ public class redAutoClose extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         armController = new ArmController(hardwareMap);
-        ArmController.setLaunchSpeed = 0.43;
+        ArmController.setLaunchSpeed = 0.435;
         armController.initArm();
 
-        mecanumDrive = new MecanumDrive(hardwareMap, redStart);
+        mecanumDrive = new MecanumDrive(hardwareMap, blueStart);
 
         waitForStart();
 
@@ -88,22 +90,22 @@ public class redAutoClose extends LinearOpMode {
                     else if (elapsed < 4300) {
                         armController.currentArmState = ArmController.armState.autoCloseShot;
                     }
-                    else if (elapsed < 5000) {
+                    else if (elapsed < 4800) {
                         armController.currentArmState = ArmController.armState.spinupShot;
                     }
                     else {
                         armController.currentArmState = ArmController.armState.autoCloseShot;
                     }
 
-                    if (elapsed >= 5800) {
+                    if (elapsed >= 5600) {
                         shotTimerRunning = false;
                         armController.currentArmState = ArmController.armState.rest;
                         shotCycle++;
 
-                        if (shotCycle == 1) {
-                            autoState = AutoState.PICKUP;
+                        if (shotCycle == 0) {
+                            autoState = AutoState.DONE;
                         } else {
-                            autoState = AutoState.LEAVE; // Go to LEAVE after the second shot set
+                            autoState = AutoState.DONE; // Go to LEAVE after the second shot set
                         }
                     }
                     break;
@@ -115,20 +117,19 @@ public class redAutoClose extends LinearOpMode {
                     // 1. Face wall first
                     Actions.runBlocking(
                             mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                    .turnTo(Math.toRadians(90))
+                                    .turnTo(Math.toRadians(45))
                                     .build()
                     );
-
                     // 2. TURN INTAKE ON (Sets the state, but updateArmState() actually runs it)
                     armController.currentArmState = ArmController.armState.intake;
 
                     // 3. Define the path
                     com.acmerobotics.roadrunner.Action pickupPath =
                             mecanumDrive.actionBuilder(new Pose2d(mecanumDrive.localizer.getPose().position, Math.toRadians(90)))
-                                    .strafeTo(redCloseShotTransition)
-                                    .strafeTo(redPickupLineup2)
-                                    .strafeTo(redPickup2)
-                                    .strafeTo(redPickupLineup2)
+                                    .strafeTo(blueCloseShotTransition)
+                                    .strafeTo(bluePickupLineup1)
+                                    .strafeTo(bluePickup1)
+                                    .strafeTo(bluePickupLineup1)
                                     .build();
 
                     // 4. MANUAL LOOP: Updates drive and arm at the same time
@@ -138,6 +139,7 @@ public class redAutoClose extends LinearOpMode {
                     }
 
                     // 5. TURN INTAKE OFF
+                    armController.currentArmState = ArmController.armState.rest;
                     armController.updateArmState(System.currentTimeMillis());
 
                     autoState = AutoState.SHOT_APPROACH;
@@ -153,7 +155,7 @@ public class redAutoClose extends LinearOpMode {
                     // 2. Build the return path
                     com.acmerobotics.roadrunner.Action returnPath =
                             mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                    .strafeToLinearHeading(redCloseShot, Math.toRadians(123))
+                                    .strafeToLinearHeading(blueCloseShot, Math.toRadians(123))
                                     .build();
 
                     // 3. Manual loop to keep motors spinning during movement
@@ -171,7 +173,7 @@ public class redAutoClose extends LinearOpMode {
                     // Define the path simply using strafeTo and the coordinate
                     com.acmerobotics.roadrunner.Action leavePath =
                             mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose())
-                                    .strafeTo(new Vector2d(-20, 45))
+                                    .strafeToLinearHeading(new Vector2d(-20, -45), Math.toRadians(270))
                                     .build();
 
                     // Manual loop keeps the arm controller alive while moving

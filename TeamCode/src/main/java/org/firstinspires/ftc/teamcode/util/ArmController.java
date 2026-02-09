@@ -37,7 +37,7 @@ public class ArmController {
     public final double advancementServoSpeedOff = 0.0;
 
     public double actualVelocity = 0.0;
-    public double setLaunchSpeed = 0.41;
+    public static double setLaunchSpeed = 0.41;
 
 
     /* ================= State ================= */
@@ -68,8 +68,8 @@ public class ArmController {
 
     /* ================= PIDF ================= */
 
-    public double P = 7;
-    public double F = 12;
+    public double P = 1.8;
+    public double F = 13.05;
 
     /* ================= Constructor ================= */
 
@@ -94,6 +94,8 @@ public class ArmController {
         intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
 
         advancementServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }

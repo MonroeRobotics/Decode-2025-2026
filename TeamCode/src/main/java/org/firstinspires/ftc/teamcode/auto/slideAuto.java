@@ -47,7 +47,7 @@ public class slideAuto extends LinearOpMode{
         TRUE_STOP
 
     }
-    AutoState autoState = slideAuto.AutoState.SHOT;
+    AutoState autoState = AutoState.SHOT_APPROACH;
 
     long shotWaitTimer;
     boolean shotTimerStarted = false;
@@ -60,7 +60,7 @@ public class slideAuto extends LinearOpMode{
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         armController = new ArmController(hardwareMap);
-        armController.setLaunchSpeed = 0.43;
+        ArmController.setLaunchSpeed = 0.43;
         armController.initArm();
 
         previousGamepad = new Gamepad();
@@ -81,7 +81,7 @@ public class slideAuto extends LinearOpMode{
                     break;
             }
             armController.updateArmState(System.currentTimeMillis());
-            telemetry.addData("shotLaunchSpeed", armController.setLaunchSpeed);
+            telemetry.addData("shotLaunchSpeed", ArmController.setLaunchSpeed);
         }
     }
 }
